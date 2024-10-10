@@ -18,6 +18,7 @@ spec:
         app-source: ${ARGOCD_APP_NAME}
   syncPolicy:
     automated:
+      prune: true
       selfHeal: false
     syncOptions:
       - CreateNamespace=true
