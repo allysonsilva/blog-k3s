@@ -12,14 +12,13 @@ spec:
     path: mysql
     repoURL: https://github.com/allysonsilva/blog-k3s
     targetRevision: main
-    kustomize:
-      commonAnnotationsEnvsubst: true
-      commonAnnotations:
-        app-source: ${ARGOCD_APP_NAME}
+    # kustomize:
+    #   commonAnnotationsEnvsubst: true
+    #   commonAnnotations:
+    #     app-source: ${ARGOCD_APP_NAME}
   syncPolicy:
     automated:
-      prune: true
+      prune: false
       selfHeal: false
     syncOptions:
       - CreateNamespace=true
-      - ServerSideApply=true
