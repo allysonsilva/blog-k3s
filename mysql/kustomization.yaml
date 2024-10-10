@@ -1,0 +1,31 @@
+# kubectl kustomize ./ | k apply -f - --dry-run=client
+# kustomize build . > deploy.yml
+apiVersion: kustomize.config.k8s.io/v1beta1
+# https://kubernetes.io/docs/tasks/manage-kubernetes-objects/kustomization/
+kind: Kustomization
+
+# https://github.com/kubernetes-sigs/kustomize/blob/master/examples/generatorOptions.md
+generatorOptions:
+  disableNameSuffixHash: true
+
+resources:
+  - namespace.yaml
+  - deployment.yaml
+  - mysql-env-sealed.yaml
+
+namespace: database
+
+# k create configmap mysql-config --namespace database --from-file=my.cnf
+configMapGenerator:
+- name: mysql-config
+  files:
+  - my.cnf
+
+# Create a Sealed Secret
+# # k create secret generic mysql-env --namespace database --from-env-file=.env --dry-run=client --output yaml | kubeseal > mysql-env-sealed.yaml --format yaml
+# # https://kubectl.docs.kubernetes.io/references/kustomize/kustomization/secretgenerator/
+# secretGenerator:
+# - name: mysql-env
+#   envs:
+#   - .env
+#   type: Opaque
