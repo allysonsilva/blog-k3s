@@ -11,7 +11,7 @@ generatorOptions:
 resources:
   - namespace.yaml
   - deployment.yaml
-  - mysql-env-sealed.yaml
+  - credentials.yaml
 
 namespace: database
 

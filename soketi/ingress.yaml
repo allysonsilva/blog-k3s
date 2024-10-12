@@ -1,0 +1,15 @@
+apiVersion: traefik.io/v1alpha1
+kind: IngressRoute
+metadata:
+  name: soketi
+  namespace: soketi
+spec:
+  entryPoints:
+    - websecure
+  routes:
+  - kind: Rule
+    match: Host(`ws.$ARGOCD_APP_DOMAIN`)
+    services:
+    - name: soketi-blog
+      port: 6001
+      passHostHeader: true

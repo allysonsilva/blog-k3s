@@ -1,0 +1,17 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: soketi-blog-metrics
+  namespace: soketi
+  labels:
+    name: soketi-blog-metrics-service
+spec:
+  type: ClusterIP
+  ports:
+    - port: 9601
+      targetPort: 9601
+      protocol: TCP
+      name: metrics
+  selector:
+    app.kubernetes.io/name: blog
+    app.kubernetes.io/instance: soketi

@@ -1,0 +1,25 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: soketi
+  namespace: gitops
+spec:
+  project: default
+  destination:
+    namespace: database
+    server: https://kubernetes.default.svc
+  source:
+    path: soketi
+    repoURL: https://github.com/allysonsilva/blog-k3s
+    targetRevision: main
+    plugin:
+      name: envsubst
+      env:
+        - name: APP_DOMAIN
+          value: $APP_DOMAIN
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+      - CreateNamespace=true

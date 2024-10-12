@@ -1,0 +1,20 @@
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  name: soketi-blog
+  namespace: monitoring
+  labels:
+    app: soketi
+    release: prometheus-stack
+spec:
+  namespaceSelector:
+    matchNames:
+      - soketi
+  selector:
+    matchLabels:
+      name: soketi-blog-metrics-service
+  endpoints:
+    - port: "metrics"
+      path: /metrics
+      interval: 5s
+      scrapeTimeout: 3s
