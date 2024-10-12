@@ -1,4 +1,5 @@
 # kubectl kustomize ./ | k apply -f - --dry-run=client
+# kubectl kustomize ./ | k delete -f -
 # kustomize build . > deploy.yml
 apiVersion: kustomize.config.k8s.io/v1beta1
 # https://kubernetes.io/docs/tasks/manage-kubernetes-objects/kustomization/
@@ -9,9 +10,9 @@ generatorOptions:
   disableNameSuffixHash: true
 
 resources:
-  - namespace.yaml
-  - deployment.yaml
-  - credentials.yaml
+- namespace.yaml
+- deployment.yaml
+- credentials.yaml
 
 namespace: database
 
