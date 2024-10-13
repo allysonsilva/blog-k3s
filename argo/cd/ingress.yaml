@@ -1,3 +1,4 @@
+# ./scripts/env-to-file.sh --file=argo/cd/ingress.yaml | k apply -f -
 ---
 apiVersion: traefik.io/v1alpha1
 kind: ServersTransport
