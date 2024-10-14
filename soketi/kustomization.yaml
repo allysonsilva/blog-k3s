@@ -28,7 +28,7 @@ transformers:
     kind: ServiceMonitor
     name: soketi-blog
 
-# kustomize build --enable-helm . | kubectl apply -f -
+# kustomize build --enable-helm . | kubectl apply -f - --dry-run=client
 helmCharts:
 - name: soketi
   # @see https://github.com/soketi/charts/tree/soketi-2.0.0/charts/soketi

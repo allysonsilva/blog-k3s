@@ -8,7 +8,7 @@ spec:
     - websecure
   routes:
   - kind: Rule
-    match: Host(`ws.alysonsilva.dev`)
+    match: Host(`ws.${ARGOCD_ENV_DOMAIN}`)
     services:
     - name: soketi-blog
       port: 6001

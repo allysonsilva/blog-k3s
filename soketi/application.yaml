@@ -1,8 +1,12 @@
+# ./scripts/env-to-file.sh --file=soketi/application.yaml | k apply -f -
+# k describe application.argoproj.io --namespace gitops soketi
 apiVersion: argoproj.io/v1alpha1
 kind: Application
 metadata:
   name: soketi
   namespace: gitops
+  finalizers:
+    - resources-finalizer.argocd.argoproj.io
 spec:
   project: default
   destination:
