@@ -11,6 +11,7 @@ namespace: gitops
 # kubectl -n gitops get secret argocd-initial-admin-secret -o jsonpath="{.data.password}" | base64 -d
 helmCharts:
 - name: argo-cd
+  # https://github.com/argoproj/argo-helm/tree/main/charts/argo-cd
   repo: https://argoproj.github.io/argo-helm
   releaseName: argo-cd
   namespace: gitops

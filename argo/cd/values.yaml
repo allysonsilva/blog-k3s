@@ -128,7 +128,10 @@ server:
   # -- The number of server pods to run
   replicas: 1
   ingress:
-    enabled: false
+    enabled: true
+    # -- Specific implementation for ingress controller. One of `generic`, `aws` or `gke`
+    ## Additional configuration might be required in related configuration sections
+    controller: generic
   metrics:
     enabled: true
     serviceMonitor:
