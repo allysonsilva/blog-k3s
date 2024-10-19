@@ -1,0 +1,187 @@
+# ./scripts/env-to-file.sh --file=argo/cd/application-helm.yaml | k apply -f -
+# k describe application.argoproj.io --namespace argocd argocd-helm
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: argocd-helm
+  namespace: argocd
+  # # Add this finalizer ONLY if you want these to cascade delete (A cascade delete, deletes both the app and its resources, rather than only the app.)
+  # finalizers:
+  # - resources-finalizer.argocd.argoproj.io
+spec:
+  project: default
+  destination:
+    namespace: argocd
+    server: https://kubernetes.default.svc
+  syncPolicy:
+    automated:
+      prune: true # Specifies if resources should be pruned during auto-syncing ( false by default ).
+      selfHeal: true # Specifies if partial app sync should be executed when resources are changed only in target Kubernetes cluster and no git change detected ( false by default ).
+      allowEmpty: false # Allows deleting all application resources during automatic syncing ( false by default ).
+    syncOptions:
+      - CreateNamespace=true
+      - PrunePropagationPolicy=foreground
+  source:
+    # argocd admin initial-password -n argocd
+    # export ARGOCD_PWD=$(kubectl -n argocd get secret argocd-initial-admin-secret -o jsonpath="{.data.password}" | base64 -d)
+    # until argocd login --core --username admin --password $ARGOCD_PWD --insecure; do :; done
+    # argocd login --core --username admin --password "PASSWORD" --insecure
+    # kubectl config set-context --current --namespace=argocd
+    # argocd app list
+    # argocd app get argocd-helm
+    # argocd app sync argocd-helm
+    chart: argo-cd
+    repoURL: https://argoproj.github.io/argo-helm
+    targetRevision: 7.5.2
+    helm:
+      # releaseName: argo-cd
+      valuesObject:
+        fullnameOverride: argocd
+
+        ## Globally shared configuration
+        global:
+          # -- Default domain used by all components
+          ## Used for ingresses, certificates, SSO, notifications, etc.
+          domain: argocd.$APP_DOMAIN
+
+        ## ApplicationSet controller
+        applicationSet:
+          enabled: false
+
+        ## Notifications controller
+        notifications:
+          enabled: false
+
+        dex:
+          enabled: false
+
+        ## Argo Configs
+        configs:
+          params:
+            server.insecure: true
+          cm:
+            kustomize.buildOptions: "--load-restrictor LoadRestrictionsNone"
+          cmp:
+            create: true
+            plugins:
+              kustomize-build-with-helm:
+                generate:
+                  command: ["sh", "-c"]
+                  args: ["kustomize build --enable-helm"]
+              envsubst:
+                init:
+                  command: ["sh", "-c"]
+                  args: ["kustomize build --enable-helm . --load-restrictor LoadRestrictionsNone -o raw-kustomization.yaml"]
+                generate:
+                  command: ["sh", "-c"]
+                  args: ["envsubst < raw-kustomization.yaml > processed-kustomization.yaml && cp processed-kustomization.yaml /dev/stdout"]
+                discover:
+                  fileName: "kustomization.*"
+
+        ## Repo Server
+        repoServer:
+          replicas: 1
+
+          volumes:
+            - name: cmp-kustomize-build-with-helm
+              configMap:
+                name: argocd-cmp-cm
+            - name: cmp-envsubst
+              configMap:
+                name: argocd-cmp-cm
+            - name: custom-tools
+              emptyDir: {}
+            - name: cmp-tmp
+              emptyDir: {}
+
+          initContainers:
+            - name: download-tools
+              image: golang:1.21-alpine3.17
+              command: [sh, -c]
+              args:
+                - apk add git && go install github.com/drone/envsubst/cmd/envsubst@v1.0.3 && mv $${no_value}GOPATH/bin/envsubst /custom-tools/
+              volumeMounts:
+                - mountPath: /custom-tools
+                  name: custom-tools
+
+          extraContainers:
+            - name: kustomize-build-with-helm
+              command:
+                - argocd-cmp-server
+              image: '{{ default .Values.global.image.repository .Values.repoServer.image.repository }}:{{ default (include "argo-cd.defaultTag" .) .Values.repoServer.image.tag }}'
+              securityContext:
+                runAsNonRoot: true
+                runAsUser: 999
+                allowPrivilegeEscalation: false
+                readOnlyRootFilesystem: true
+                seccompProfile:
+                  type: RuntimeDefault
+                capabilities:
+                  drop: [ "ALL" ]
+              volumeMounts:
+                - name: plugins
+                  mountPath: /home/argocd/cmp-server/plugins
+                - name: cmp-kustomize-build-with-helm
+                  mountPath: /home/argocd/cmp-server/config/plugin.yaml
+                  subPath: kustomize-build-with-helm.yaml
+                - mountPath: /tmp
+                  name: cmp-tmp
+
+            - name: envsubst
+              command: [/var/run/argocd/argocd-cmp-server]
+              image: '{{ default .Values.global.image.repository .Values.repoServer.image.repository }}:{{ default (include "argo-cd.defaultTag" .) .Values.repoServer.image.tag }}'
+              securityContext:
+                runAsNonRoot: true
+                runAsUser: 999
+              volumeMounts:
+                - name: var-files
+                  mountPath: /var/run/argocd
+                - name: plugins
+                  mountPath: /home/argocd/cmp-server/plugins
+                # Remove this volumeMount if you've chosen to bake the config file into the sidecar image.
+                - mountPath: /home/argocd/cmp-server/config/plugin.yaml
+                  subPath: envsubst.yaml
+                  name: cmp-envsubst
+                # Mount tools into "PATH"
+                - name: custom-tools
+                  subPath: envsubst
+                  mountPath: /usr/local/bin/envsubst
+                # Starting with v2.4, do NOT mount the same tmp volume as the repo-server container. The filesystem separation helps
+                # mitigate path traversal attacks.
+                - mountPath: /tmp
+                  name: cmp-tmp
+
+          metrics:
+            enabled: true
+            serviceMonitor:
+              enabled: true
+              namespace: monitoring
+              additionalLabels:
+                release: prometheus-stack
+
+        controller:
+          # -- The number of application controller pods to run.
+          replicas: 1
+          metrics:
+            enabled: true
+            serviceMonitor:
+              enabled: true
+              namespace: monitoring
+              additionalLabels:
+                release: prometheus-stack
+
+        server:
+          # -- The number of server pods to run
+          replicas: 1
+          # ingress:
+          #   enabled: true
+          #   # -- Specific implementation for ingress controller. One of `generic`, `aws` or `gke`
+          #   ## Additional configuration might be required in related configuration sections
+          #   controller: generic
+          metrics:
+            enabled: true
+            serviceMonitor:
+              enabled: true
+              namespace: monitoring
+              additionalLabels:
+                release: prometheus-stack
