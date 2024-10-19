@@ -15,8 +15,8 @@ helmCharts:
   releaseName: argo-cd
   namespace: gitops
   version: 7.5.2
-  # valuesInline:
-  #   global:
-  #     ## Used for ingresses, certificates, SSO, notifications, etc.
-  #     domain: argocd.${APP_DOMAIN}
+  valuesInline:
+    global:
+      ## Used for ingresses, certificates, SSO, notifications, etc.
+      domain: argocd.$ARGOCD_ENV_DOMAIN
   valuesFile: values.yaml
