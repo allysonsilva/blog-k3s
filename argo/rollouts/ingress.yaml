@@ -1,0 +1,15 @@
+apiVersion: traefik.io/v1alpha1
+kind: IngressRoute
+metadata:
+  name: argo-rollouts-dashboard
+  namespace: argo-rollouts
+spec:
+  entryPoints:
+    - websecure
+  routes:
+    - kind: Rule
+      match: Host(`argo-rollouts.$APP_DOMAIN`)
+      priority: 10
+      services:
+        - name: argo-rollouts-helm-dashboard
+          port: 3100
