@@ -1,8 +1,9 @@
+# ./scripts/env-to-file.sh --file=mysql/application.yaml | k apply -f -
 apiVersion: argoproj.io/v1alpha1
 kind: Application
 metadata:
   name: mysql
-  namespace: gitops
+  namespace: argocd
 spec:
   project: default
   destination:
@@ -11,7 +12,7 @@ spec:
   source:
     path: mysql
     repoURL: https://github.com/allysonsilva/blog-k3s
-    targetRevision: main
+    targetRevision: HEAD
     # kustomize:
     #   commonAnnotationsEnvsubst: true
     #   commonAnnotations:
