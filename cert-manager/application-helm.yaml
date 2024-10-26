@@ -1,0 +1,51 @@
+# ./scripts/env-to-file.sh --file=cert-manager/application-helm.yaml | k apply -f -
+# k describe application.argoproj.io --namespace argocd cert-manager-helm
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: cert-manager-helm
+  namespace: argocd
+spec:
+  project: default
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: cert-manager
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+      - CreateNamespace=true
+      - PrunePropagationPolicy=foreground
+  source:
+    chart: cert-manager
+    repoURL: https://charts.jetstack.io
+    targetRevision: v1.15.3
+    # https://github.com/cert-manager/cert-manager/tree/master/deploy/charts/cert-manager
+    helm:
+      valuesObject:
+        fullnameOverride: cert-manager
+        installCRDs: true
+        # resources:
+        #   requests:
+        #     cpu: 75m
+        #     memory: 150Mi
+        #   limits:
+        #     cpu: 75m
+        #     memory: 150Mi
+        podDisruptionBudget:
+          enabled: true
+        prometheus:
+          servicemonitor:
+            enabled: true
+            namespace: monitoring
+            labels:
+              release: prometheus-stack
+        # extraArgs:
+        #   - --logging-format=json
+        # webhook:
+        #   extraArgs:
+        #     - --logging-format=json
+        # cainjector:
+        #   extraArgs:
+        #     - --logging-format=json

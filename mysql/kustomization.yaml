@@ -24,6 +24,7 @@ configMapGenerator:
 # Create a Sealed Secret
 # # k create secret generic mysql-env --namespace database --from-env-file=.env --dry-run=client --output yaml | kubeseal > mysql-env-sealed.yaml --format yaml
 # # https://kubectl.docs.kubernetes.io/references/kustomize/kustomization/secretgenerator/
+# OR
 # secretGenerator:
 # - name: mysql-env
 #   envs:
