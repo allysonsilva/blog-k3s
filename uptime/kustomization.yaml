@@ -1,0 +1,26 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+
+generatorOptions:
+  disableNameSuffixHash: true
+
+resources:
+- manifests.yaml
+- application.yaml
+
+namespace: uptime-kuma
+
+replacements:
+  - source:
+      name: general-config
+      kind: ConfigMap
+      fieldPath: data.APP_DOMAIN
+    targets:
+      - select:
+          kind: IngressRoute
+          name: uptime-kuma
+        fieldPaths:
+          - spec.routes.0.match
+        options:
+          delimiter: "."
+          index: 1

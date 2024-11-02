@@ -1,0 +1,24 @@
+# k apply -f uptime/application.yaml
+# k describe application.argoproj.io --namespace argocd uptime-kuma
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: uptime-kuma
+  namespace: argocd
+  finalizers:
+    - resources-finalizer.argocd.argoproj.io
+spec:
+  project: default
+  destination:
+    namespace: uptime-kuma
+    server: https://kubernetes.default.svc
+  source:
+    path: uptime
+    repoURL: https://github.com/allysonsilva/blog-k3s
+    targetRevision: HEAD
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+      - CreateNamespace=true

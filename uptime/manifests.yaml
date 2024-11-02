@@ -1,0 +1,75 @@
+kind: Namespace
+apiVersion: v1
+metadata:
+  name: uptime-kuma
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: uptime-kuma
+  namespace: uptime-kuma
+spec:
+  selector:
+    app: uptime-kuma
+  ports:
+  - name: uptime-kuma
+    protocol: TCP
+    port: 3001
+    targetPort: 3001
+---
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: uptime-kuma
+  namespace: uptime-kuma
+spec:
+  selector:
+    matchLabels:
+      app: uptime-kuma # has to match .spec.template.metadata.labels
+  serviceName: "uptime-kuma"
+  replicas: 1
+  minReadySeconds: 10
+  template:
+    metadata:
+      labels:
+        app: uptime-kuma # has to match .spec.selector.matchLabels
+    spec:
+      terminationGracePeriodSeconds: 10
+      containers:
+      - name: uptime-kuma
+        image: louislam/uptime-kuma:1
+        env:
+        - name: UPTIME_KUMA_PORT
+          value: "3001"
+        ports:
+        - containerPort: 3001
+          name: uptime-kuma-web
+        volumeMounts:
+        - name: kuma-data
+          mountPath: /app/data
+  volumeClaimTemplates:
+  - metadata:
+      name: kuma-data
+    spec:
+      accessModes: [ "ReadWriteOnce" ]
+      volumeMode: Filesystem
+      resources:
+        requests:
+          storage: 1Gi
+---
+apiVersion: traefik.io/v1alpha1
+kind: IngressRoute
+metadata:
+  name: uptime-kuma
+  namespace: uptime-kuma
+  # annotations:
+  #   kubernetes.io/ingress.class: traefik-internal
+spec:
+  entryPoints:
+    - websecure
+  routes:
+    - match: Host(`uptime.$APP_DOMAIN`)
+      kind: Rule
+      services:
+        - name: uptime-kuma
+          port: 3001
