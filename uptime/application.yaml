@@ -1,4 +1,4 @@
-# k apply -f uptime/application.yaml
+# ./scripts/env-to-file.sh --file=uptime/application.yaml | k apply -f -
 # k describe application.argoproj.io --namespace argocd uptime-kuma
 apiVersion: argoproj.io/v1alpha1
 kind: Application
@@ -16,6 +16,11 @@ spec:
     path: uptime
     repoURL: https://github.com/allysonsilva/blog-k3s
     targetRevision: HEAD
+    plugin:
+      name: envsubst
+      env:
+        - name: DOMAIN
+          value: ${APP_DOMAIN}
   syncPolicy:
     automated:
       prune: true
