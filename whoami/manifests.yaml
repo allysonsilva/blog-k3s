@@ -1,0 +1,53 @@
+# k apply -f whoami/manifests.yaml
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: whoami
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: whoami
+  namespace: whoami
+  labels:
+    service: whoami
+spec:
+  type: ClusterIP
+  ports:
+    - name: whoami-http
+      port: 80
+      targetPort: whoami-web
+      protocol: TCP
+  selector:
+    app: whoami
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: whoami
+  namespace: whoami
+  labels:
+    app: whoami
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: whoami
+  template:
+    metadata:
+      labels:
+        app: whoami
+    spec:
+      containers:
+        - name: whoami
+          image: traefik/whoami
+          resources:
+            requests:
+              cpu: 100m
+              memory: 100Mi
+            limits:
+              cpu: 100m
+              memory: 100Mi
+          ports:
+            - name: whoami-web
+              containerPort: 80
