@@ -1,0 +1,33 @@
+# 3 - ./scripts/env-to-file.sh --file=app/certificate/certificate.yaml | k apply -f -
+apiVersion: cert-manager.io/v1
+# https://cert-manager.io/docs/tutorials/acme/dns-validation/#issuing-an-acme-certificate-using-dns-validation
+# cmctl status certificate default-cert-manager -n kube-system
+#
+# kubectl get Issuers,ClusterIssuers,Certificates,CertificateRequests,Orders,Challenges --all-namespaces
+#
+# kubectl api-resources --verbs=list --namespaced -o name \
+#   | xargs -n 1 kubectl get --show-kind --ignore-not-found -n <namespace>
+#
+# kubectl config set-context --current --namespace=default
+kind: Certificate
+metadata:
+  name: default-cert-manager
+  namespace: kube-system
+spec:
+  secretName: default-cert
+  subject:
+    organizations:
+      - $APP_DOMAIN
+  commonName: $APP_DOMAIN
+  dnsNames:
+    - $APP_DOMAIN
+    - '*.$APP_DOMAIN'
+  privateKey:
+    algorithm: RSA
+    encoding: PKCS1
+    size: 2048
+  duration: 2160h # 90d
+  renewBefore: 1440h # 30d
+  issuerRef:
+    name: letsencrypt-issuer
+    kind: ClusterIssuer

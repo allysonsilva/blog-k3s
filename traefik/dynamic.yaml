@@ -1,0 +1,11 @@
+# k apply -f traefik/dynamic.yaml
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: traefik-dynamic-config
+  namespace: kube-system
+data:
+  dynamic.yaml: |-
+    logs:
+      access:
+        enabled: true

@@ -1,0 +1,16 @@
+apiVersion: traefik.io/v1alpha1
+kind: Middleware
+metadata:
+  name: low-ratelimit
+  namespace: default
+spec:
+  rateLimit:
+    average: 100
+    period: 10s
+    burst: 50
+    sourceCriterion:
+      ipStrategy:
+        excludedIPs:
+          - 127.0.0.1/32
+      # requestHeaderName: X-Real-Ip
+      # requestHost: true

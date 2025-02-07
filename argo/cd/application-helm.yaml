@@ -173,6 +173,13 @@ spec:
         server:
           # -- The number of server pods to run
           replicas: 1
+          extensions:
+            enabled: true
+            extensionList:
+              - name: rollout-extension
+                env:
+                  - name: EXTENSION_URL
+                    value: https://github.com/argoproj-labs/rollout-extension/releases/download/v0.3.5/extension.tar
           # ingress:
           #   enabled: true
           #   # -- Specific implementation for ingress controller. One of `generic`, `aws` or `gke`

@@ -1,0 +1,78 @@
+# @see https://fidelissauro.dev/argo-rollouts-qual-a-forma-mais-simples-de-executar-canary-releases-e-blue-green-deployments-no/
+# kubectl argo rollouts get rollout blog-rollout
+# kubectl argo rollouts promote blog-rollout
+apiVersion: argoproj.io/v1alpha1
+kind: Rollout
+metadata:
+  name: blog-rollout
+  labels:
+    app: blog
+spec:
+  strategy:
+    blueGreen:
+      activeService: blog-active
+      previewService: blog-preview
+      previewReplicaCount: 2
+      scaleDownDelayRevisionLimit: 1
+      autoPromotionEnabled: false
+  replicas: 5
+  revisionHistoryLimit: 2
+  minReadySeconds: 30
+  selector:
+    matchLabels:
+      app: blog
+  template:
+    metadata:
+      labels:
+        app: blog
+    spec:
+      imagePullSecrets:
+        - name: gcloud-artifact-registry
+      initContainers:
+        - name: app-blog-migration
+          image: "${APP_CONTAINER_IMAGE}"
+          # Note:
+          # The command field corresponds to ENTRYPOINT,
+          # and the args field corresponds to CMD in some container runtimes.
+          command:
+            - php
+          args:
+            - artisan
+            - migrate:status
+          env:
+            - name: CONTAINER_ROLE
+              value: "CUSTOM"
+            - name: FORCE_MIGRATE
+              value: 'true'
+          envFrom:
+            - configMapRef:
+                name: app-config
+            - secretRef:
+                name: app-secret
+      containers:
+        - name: app-blog
+          image: "${APP_CONTAINER_IMAGE}"
+          ports:
+            - containerPort: 8000
+          imagePullPolicy: IfNotPresent
+          # resources:
+          #   requests:
+          #     cpu: 100m
+          #     memory: 128Mi
+          #   limits:
+          #     cpu: 1
+          #     memory: 256Mi
+          env:
+            - name: CONTAINER_ROLE
+              value: "APP"
+            - name: FORCE_MIGRATE
+              value: 'false'
+            - name: PHP_MEMORY_LIMIT
+              value: "256M"
+            - name: PHP_MAX_EXECUTION_TIME
+              value: "60"
+          envFrom:
+            - configMapRef:
+                name: app-config
+            - secretRef:
+                name: app-secret

@@ -1,0 +1,19 @@
+# 2 - ./scripts/env-to-file.sh --file=app/certificate/issuer.yaml | k apply -f -
+apiVersion: cert-manager.io/v1
+kind: ClusterIssuer
+metadata:
+  name: letsencrypt-issuer
+spec:
+  acme:
+    email: server@$APP_DOMAIN
+    server: https://acme-v02.api.letsencrypt.org/directory
+    privateKeySecretRef:
+      # if not existing, it will register a new account and stores it
+      name: letsencrypt-issuer-account-key
+    solvers:
+    - selector: {}
+      dns01:
+        cloudflare:
+          apiTokenSecretRef:
+            name: cloudflare-api-token
+            key: api-token

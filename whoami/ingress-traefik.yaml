@@ -14,5 +14,8 @@ spec:
         - name: whoami
           port: whoami-http
           passHostHeader: true
-      # middlewares:
-      #   - name: real-ip@file
+      middlewares:
+        - name: plugin-demo
+          namespace: default
+        - name: cloudflare-real-ip
+          namespace: default

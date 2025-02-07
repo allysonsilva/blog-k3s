@@ -1,0 +1,11 @@
+apiVersion: traefik.io/v1alpha1
+kind: Middleware
+metadata:
+  name: management
+  namespace: default
+spec:
+  chain:
+    middlewares:
+    - name: security
+    - name: low-ratelimit
+    - name: noindex-page-headers

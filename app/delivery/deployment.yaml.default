@@ -1,0 +1,178 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: blog
+spec:
+  selector:
+    app: blog
+  ports:
+    - name: entrypoint
+      port: 8000
+      targetPort: 8000
+      protocol: TCP
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: blog
+spec:
+  replicas: 3
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxSurge: 1 # Somente 1 réplica nova criada por vez
+      maxUnavailable: 0 # Nenhuma réplica antiga será removida até existir uma nova
+  selector:
+    matchLabels:
+      app: blog
+  template:
+    metadata:
+      labels:
+        app: blog
+        # force: deploy # Label aleatória criada só pra forçar um deploy
+    spec:
+      imagePullSecrets:
+        - name: gcloud-artifact-registry
+      initContainers:
+        - name: app-blog-migration
+          image: "${APP_CONTAINER_IMAGE}"
+          # Note:
+          # The command field corresponds to ENTRYPOINT,
+          # and the args field corresponds to CMD in some container runtimes.
+          command:
+            - php
+          args:
+            - artisan
+            - migrate:status
+          env:
+            - name: CONTAINER_ROLE
+              value: "CUSTOM"
+            - name: FORCE_MIGRATE
+              value: 'true'
+          envFrom:
+            - configMapRef:
+                name: app-config
+            - secretRef:
+                name: app-secret
+      containers:
+        - name: app-blog
+          image: "${APP_CONTAINER_IMAGE}"
+          ports:
+            - containerPort: 8000
+          imagePullPolicy: IfNotPresent
+          # readinessProbe:
+          #   exec:
+          #     command: ["php", "artisan", "octane:status"]
+          #   periodSeconds: 10
+          #   initialDelaySeconds: 20
+          resources:
+            requests:
+              cpu: 100m
+              memory: 128Mi
+            limits:
+              cpu: 2
+              memory: 4Gi
+          env:
+            - name: CONTAINER_ROLE
+              value: "APP"
+            - name: FORCE_MIGRATE
+              value: 'false'
+            - name: PHP_MEMORY_LIMIT
+              value: "128M"
+            - name: PHP_MAX_EXECUTION_TIME
+              value: "60"
+          envFrom:
+            - configMapRef:
+                name: app-config
+            - secretRef:
+                name: app-secret
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: queue
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: queue
+  template:
+    metadata:
+      labels:
+        app: queue
+    spec:
+      imagePullSecrets:
+        - name: gcloud-artifact-registry
+      containers:
+        - name: app-queue
+          image: "${APP_CONTAINER_IMAGE}"
+          imagePullPolicy: IfNotPresent
+          resources:
+            requests:
+              cpu: 100m
+              memory: 128Mi
+            limits:
+              cpu: 1
+              memory: 2Gi
+          env:
+            - name: CONTAINER_ROLE
+              value: "QUEUE"
+            - name: PHP_MEMORY_LIMIT
+              value: "128M"
+            - name: PHP_MAX_EXECUTION_TIME
+              value: "180"
+            - name: QUEUE_MEMORY
+              value: "64"
+            - name: QUEUE_TRIES
+              value: "3"
+            - name: QUEUE_BACKOFF
+              value: "3"
+            - name: QUEUE_SLEEP
+              value: "5"
+            - name: QUEUE_TIMEOUT
+              value: "60"
+          envFrom:
+            - configMapRef:
+                name: app-config
+            - secretRef:
+                name: app-secret
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: scheduler
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: scheduler
+  template:
+    metadata:
+      labels:
+        app: scheduler
+    spec:
+      imagePullSecrets:
+        - name: gcloud-artifact-registry
+      containers:
+        - name: app-scheduler
+          image: "${APP_CONTAINER_IMAGE}"
+          imagePullPolicy: IfNotPresent
+          resources:
+            requests:
+              cpu: 100m
+              memory: 128Mi
+            limits:
+              cpu: 1
+              memory: 2Gi
+          env:
+            - name: CONTAINER_ROLE
+              value: "SCHEDULER"
+            - name: PHP_MEMORY_LIMIT
+              value: "32M"
+            - name: PHP_MAX_EXECUTION_TIME
+              value: "60"
+          envFrom:
+            - configMapRef:
+                name: app-config
+            - secretRef:
+                name: app-secret

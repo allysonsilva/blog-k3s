@@ -1,0 +1,11 @@
+apiVersion: traefik.io/v1alpha1
+kind: Middleware
+metadata:
+  name: security
+  namespace: default
+spec:
+  chain:
+    middlewares:
+    - name: hsts-headers
+    - name: secure-headers
+    - name: cloudflare-real-ip

@@ -1,0 +1,96 @@
+# ./scripts/env-to-file.sh --env=app/configs/.env --file=app/configs/config.yaml | k apply -f -
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: app-config
+  namespace: default
+data:
+  APP_NAME: "$APP_NAME"
+  APP_KEY: "$APP_KEY"
+  APP_ENV: "production"
+  APP_DEBUG: "false"
+  APP_URL: "https://${APP_DOMAIN}/"
+  APP_HOSTNAME: "$APP_DOMAIN"
+
+  # OCTANE_SERVER: frankenphp
+  OCTANE_HTTPS: "true"
+
+  LOG_CHANNEL: "stderr"
+  LOG_LEVEL: "debug"
+
+  BROADCAST_DRIVER: "pusher"
+
+  PUSHER_HOST: "soketi-blog.soketi.svc"
+  PUSHER_PORT: "6001"
+  PUSHER_SCHEME: "http"
+  MIX_PUSHER_APP_HOST: "ws.${APP_DOMAIN}"
+
+  DB_CONNECTION: "mysql"
+  # @see https://yuminlee2.medium.com/kubernetes-dns-bdca7b7cb868
+  DB_HOST: "mysql.database.svc"
+  DB_PORT: "3306"
+  DB_DATABASE: "app"
+
+  CACHE_DRIVER: "redis"
+  QUEUE_CONNECTION: "redis"
+
+  REDIS_HOST: "redis.redis.svc"
+  REDIS_PORT: "6379"
+  REDIS_QUEUE: "queue_default"
+  REDIS_PREFIX: "app_"
+
+  SESSION_DRIVER: "database"
+  SESSION_DOMAIN: ".${APP_DOMAIN}"
+  SESSION_LIFETIME: "120"
+  SESSION_SECURE_COOKIE: "true"
+
+  MAIL_MAILER: "smtp"
+  MAIL_HOST: "smtp.gmail.com"
+  MAIL_PORT: "587"
+  MAIL_ENCRYPTION: "tls"
+  MAIL_FROM_ADDRESS: "$MAIL_FROM_ADDRESS"
+  MAIL_FROM_NAME: "$APP_NAME"
+
+  MAIL_HEALTH_TO_ADDRESS: "$MAIL_HEALTH_TO_ADDRESS"
+
+  GOOGLE_ANALYTICS_ID: "$GOOGLE_ANALYTICS_ID"
+
+  ##########
+  # Packages
+  ##########
+
+  SENTRY_LARAVEL_DSN: "$SENTRY_LARAVEL_DSN"
+  # https://docs.sentry.io/platforms/php/guides/laravel/#performance-monitoring
+  SENTRY_TRACES_SAMPLE_RATE: "null"
+  # Set a sampling rate for profiling - this is relative to traces_sample_rate
+  SENTRY_PROFILES_SAMPLE_RATE: "null"
+
+  # TELESCOPE_ENABLED: "false"
+  # TELESCOPE_EMAILS_ALLOWED: "master@${APP_DOMAIN}"
+  # TELESCOPE_PATH: "/telescope/xyz"
+---
+apiVersion: v1
+kind: Secret
+metadata:
+  name: app-secret
+  namespace: default
+type: Opaque
+stringData:
+  PUSHER_APP_ID: "$PUSHER_APP_ID"
+  PUSHER_APP_KEY: "$PUSHER_APP_KEY"
+  PUSHER_APP_SECRET: "$PUSHER_APP_SECRET"
+  MIX_PUSHER_APP_KEY: "$PUSHER_APP_KEY"
+
+  DB_USERNAME: "$DB_USERNAME"
+  DB_PASSWORD: "$DB_PASSWORD"
+
+  REDIS_PASSWORD: "$REDIS_PASSWORD"
+
+  MAIL_USERNAME: "$MAIL_USERNAME"
+  MAIL_PASSWORD: "$MAIL_PASSWORD"
+
+  GITHUB_WEBHOOK_SECRET: "$GITHUB_WEBHOOK_SECRET"
+
+  VAPID_PUBLIC_KEY: "$VAPID_PUBLIC_KEY"
+  VAPID_PRIVATE_KEY: "$VAPID_PRIVATE_KEY"
+  MIX_VAPID_PUBLIC_KEY: "${VAPID_PUBLIC_KEY}"

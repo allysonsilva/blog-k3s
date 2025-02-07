@@ -1,0 +1,14 @@
+# @see https://medium.com/containers-101/how-to-handle-secrets-like-a-pro-using-gitops-f3b812536434
+# kubeseal --fetch-cert > public-cert.pem
+# kubeseal --fetch-cert --controller-name sealed-secrets-controller --controller-namespace kube-system
+apiVersion: helm.cattle.io/v1
+kind: HelmChart
+metadata:
+  name: sealed-secrets
+  namespace: kube-system
+spec:
+  chart: sealed-secrets
+  repo: https://bitnami-labs.github.io/sealed-secrets
+  version: 2.16.1
+  valuesContent: |-
+    fullnameOverride: sealed-secrets-controller
