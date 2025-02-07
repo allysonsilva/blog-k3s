@@ -6,12 +6,12 @@ generatorOptions:
 
 resources:
 - credentials.yaml
+- middleware.yaml
 - manifests.yaml
 
 # # Create a Sealed Secret
 # k create secret generic credentials --namespace=registry \
-# --from-literal="username=<username>" \
-# --from-literal="password=<password>" \
+# --from-file=users=registry.htpasswd \
 # --dry-run=client --output yaml | kubeseal > credentials.yaml --format yaml
 
 namespace: registry

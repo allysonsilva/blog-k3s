@@ -17,5 +17,3 @@ spec:
       middlewares:
         - name: plugin-demo
           namespace: default
-        - name: cloudflare-real-ip
-          namespace: default

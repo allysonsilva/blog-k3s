@@ -8,4 +8,3 @@ spec:
     middlewares:
     - name: hsts-headers
     - name: secure-headers
-    - name: cloudflare-real-ip

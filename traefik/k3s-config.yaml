@@ -21,8 +21,6 @@ spec:
       - "--entryPoints.websecure.transport.lifeCycle.graceTimeOut=60s"
       - "--experimental.plugins.plugindemo.modulename=github.com/traefik/plugindemo"
       - "--experimental.plugins.plugindemo.version=v0.2.2"
-      - "--experimental.plugins.cloudflarewarp.modulename=github.com/BetterCorp/cloudflarewarp"
-      - "--experimental.plugins.cloudflarewarp.version=v1.3.3"
     logs:
       access:
         enabled: true
