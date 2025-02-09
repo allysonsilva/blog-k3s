@@ -1,3 +1,4 @@
+---
 apiVersion: traefik.io/v1alpha1
 kind: Middleware
 metadata:
@@ -6,3 +7,12 @@ metadata:
 spec:
   basicAuth:
     secret: credentials
+---
+apiVersion: traefik.io/v1alpha1
+kind: Middleware
+metadata:
+  name: registry-middleware-limit
+  namespace: registry
+spec:
+  buffering:
+    maxRequestBodyBytes: 10737418240 # 10 gigabyte

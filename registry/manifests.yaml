@@ -81,3 +81,4 @@ spec:
       port: 5000
     middlewares:
     - name: registry-middleware-auth
+    - name: registry-middleware-limit
