@@ -14,4 +14,8 @@ resources:
 # --from-file=users=registry.htpasswd \
 # --dry-run=client --output yaml | kubeseal > credentials.yaml --format yaml
 
+# docker login registry.yourdomain.com
+# docker tag my-image registry.yourdomain.com/my-image
+# docker push registry.yourdomain.com/my-image:v1
+
 namespace: registry

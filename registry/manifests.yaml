@@ -51,6 +51,9 @@ spec:
           limits:
             cpu: 2
             memory: 2Gi
+        env:
+          - name: REGISTRY_STORAGE_DELETE_ENABLED
+            value: 'true'
 ---
 apiVersion: v1
 kind: Service
