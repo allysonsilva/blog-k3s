@@ -8,7 +8,7 @@ spec:
   routes:
     - kind: Rule
       # match: HostRegexp(`$APP_DOMAIN`, `{subdomain:[a-z0-9]+}.$APP_DOMAIN`)
-      match: Host(`$APP_DOMAIN`)
+      match: Host(`${ARGOCD_ENV_DOMAIN}`)
       priority: 10
       services:
         - name: blog-active
@@ -27,7 +27,7 @@ spec:
     - websecure
   routes:
     - kind: Rule
-      match: Host(`preview.$APP_DOMAIN`)
+      match: Host(`preview.${ARGOCD_ENV_DOMAIN}`)
       priority: 20
       services:
         - name: blog-preview
