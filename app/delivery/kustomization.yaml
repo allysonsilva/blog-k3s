@@ -28,4 +28,4 @@ images:
 # kustomize edit set image blog-image=newName:newTag
 - name: blog-image
   newName: "ewr.vultrcr.com/blog/app"
-  newTag: "1.0"
+  newTag: "2.0"
