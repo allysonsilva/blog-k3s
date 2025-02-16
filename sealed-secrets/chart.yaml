@@ -1,4 +1,5 @@
 # @see https://medium.com/containers-101/how-to-handle-secrets-like-a-pro-using-gitops-f3b812536434
+# @see https://www.civo.com/learn/sealed-secrets-in-git
 # kubeseal --fetch-cert > public-cert.pem
 # kubeseal --fetch-cert --controller-name sealed-secrets-controller --controller-namespace kube-system
 apiVersion: helm.cattle.io/v1

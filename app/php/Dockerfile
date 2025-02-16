@@ -89,9 +89,9 @@ RUN set -xe; \
         pdo_mysql \
         ds-^1 \
         amqp-^2.1@stable \
-        mongodb-^1.19@stable \
+        mongodb-^1.20@stable \
         igbinary-^3.2@stable \
-        msgpack-^2.2@stable \
+        msgpack-^3.0@stable \
         redis-^6@stable \
     ; \
     php --version \
@@ -175,7 +175,7 @@ ARG USER_GID=1000
 
 # Path docker PHP/APP folder
 # Path Config/Dockerfile PHP/APP
-ARG APP_BUILD_CONTAINER_PATH=$K3S_FOLDER/app
+ARG APP_BUILD_CONTAINER_PATH=${K3S_FOLDER}/app/php
 ENV APP_BUILD_CONTAINER_PATH $APP_BUILD_CONTAINER_PATH
 
 ARG APP_FOLDER
@@ -311,8 +311,9 @@ RUN set -xe \
     && exa --all --group --header --links --long --accessed --modified --git --icons --color=always
 
 COPY --chown=$USER_NAME:$USER_NAME --from=server /usr/local/bin/frankenphp /usr/local/bin/frankenphp
+COPY --from=server /usr/local/lib/libwatcher* /usr/local/lib
 
-RUN sudo setcap cap_net_bind_service=+ep /usr/local/bin/frankenphp
+RUN sudo setcap cap_net_bind_service=+eip /usr/local/bin/frankenphp
 
 RUN set -xe \
     && PHP_ERROR="$( php -v 2>&1 1>/dev/null )" \
@@ -326,6 +327,6 @@ VOLUME ${LOG_PATH}
 
 ENTRYPOINT ["/sbin/tini", "--", "/entrypoint.sh"]
 
-EXPOSE 80 443 443/udp 2019 8000
+EXPOSE 80 443 443/udp 2019 9111 8000
 
 # vim:set ft=dockerfile:

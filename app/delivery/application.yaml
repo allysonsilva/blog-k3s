@@ -1,19 +1,19 @@
-# ./scripts/env-to-file.sh --file=registry/application.yaml | k apply -f -
-# k describe application.argoproj.io --namespace argocd registry
+# ./scripts/env-to-file.sh --file=app/delivery/application.yaml | k apply -f -
+# k describe application.argoproj.io --namespace argocd default
 apiVersion: argoproj.io/v1alpha1
 kind: Application
 metadata:
-  name: docker-registry
+  name: blog
   namespace: argocd
   finalizers:
   - resources-finalizer.argocd.argoproj.io
 spec:
   project: default
   destination:
-    namespace: registry
+    namespace: default
     server: https://kubernetes.default.svc
   source:
-    path: registry
+    path: app/delivery
     repoURL: https://github.com/allysonsilva/blog-k3s
     targetRevision: HEAD
     plugin:
@@ -25,6 +25,5 @@ spec:
     automated:
       prune: true # Specifies if resources should be pruned during auto-syncing ( false by default ).
       selfHeal: true # Specifies if partial app sync should be executed when resources are changed only in target Kubernetes cluster and no git change detected ( false by default ).
-      allowEmpty: false # Allows deleting all application resources during automatic syncing ( false by default ).
     syncOptions:
       - CreateNamespace=true

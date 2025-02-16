@@ -27,10 +27,10 @@ spec:
         app: blog
     spec:
       imagePullSecrets:
-        - name: gcloud-artifact-registry
+        - name: vultr-cr-credentials
       initContainers:
         - name: app-blog-migration
-          image: "${APP_CONTAINER_IMAGE}"
+          image: blog-image
           # Note:
           # The command field corresponds to ENTRYPOINT,
           # and the args field corresponds to CMD in some container runtimes.
@@ -45,13 +45,11 @@ spec:
             - name: FORCE_MIGRATE
               value: 'true'
           envFrom:
-            - configMapRef:
-                name: app-config
             - secretRef:
-                name: app-secret
+                name: app-environment-configs
       containers:
         - name: app-blog
-          image: "${APP_CONTAINER_IMAGE}"
+          image: blog-image
           ports:
             - containerPort: 8000
           imagePullPolicy: IfNotPresent
@@ -72,7 +70,5 @@ spec:
             - name: PHP_MAX_EXECUTION_TIME
               value: "60"
           envFrom:
-            - configMapRef:
-                name: app-config
             - secretRef:
-                name: app-secret
+                name: app-environment-configs
