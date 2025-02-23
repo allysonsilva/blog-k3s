@@ -327,6 +327,6 @@ VOLUME ${LOG_PATH}
 
 ENTRYPOINT ["/sbin/tini", "--", "/entrypoint.sh"]
 
-EXPOSE 80 443 443/udp 2019 9111 8000
+EXPOSE 80 443 443/udp 9111 8000
 
 # vim:set ft=dockerfile:

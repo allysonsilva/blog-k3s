@@ -2,16 +2,6 @@ ARG APP_FOLDER=.
 ARG COMPOSER_VERSION=2.7
 ARG K3S_FOLDER=./k3s
 ARG PHP_BASE_IMAGE_VERSION=8.4-zts-alpine
-ARG FRANKENPHP_VERSION=1-php8.4-alpine
-
-# @see https://github.com/exaco/laravel-octane-dockerfile/blob/main/FrankenPHP.Dockerfile
-# @see https://github.com/dunglas/frankenphp/blob/main/alpine.Dockerfile
-
-#####
-## SERVER
-#####
-
-FROM dunglas/frankenphp:${FRANKENPHP_VERSION} AS server
 
 #####
 ## COMPOSER
@@ -71,7 +61,22 @@ RUN set -xe; \
     \
     apk update; \
     \
-    apk add --no-cache --virtual .phpize-deps $PHPIZE_DEPS && \
+    apk add --no-cache --virtual .phpize-deps \
+        $PHPIZE_DEPS \
+        curl-dev \
+        linux-headers \
+        brotli-dev \
+        openssl-dev \
+        pcre-dev \
+        sqlite-dev \
+        icu-dev \
+        pcre2-dev \
+        zlib-dev \
+        rabbitmq-c-dev \
+    ; \
+    apk add --no-cache libstdc++ \
+    ; \
+    pecl channel-update pecl.php.net && \
     docker-php-ext-configure mysqli --with-mysqli=mysqlnd && \
     docker-php-ext-configure pdo_mysql --with-pdo-mysql=mysqlnd && \
     install-php-extensions \
@@ -93,8 +98,21 @@ RUN set -xe; \
         igbinary-^3.2@stable \
         msgpack-^3.0@stable \
         redis-^6@stable \
-    ; \
-    php --version \
+        ; \
+    # SWOOLE
+    mkdir -p /usr/src/php/ext/swoole && \
+    curl -sfL https://github.com/swoole/swoole-src/archive/v6.0.1.tar.gz -o swoole.tar.gz && \
+    tar xfz swoole.tar.gz --strip-components=1 -C /usr/src/php/ext/swoole && \
+    docker-php-ext-configure swoole \
+        --enable-swoole-curl   \
+        --enable-swoole-thread \
+        --enable-mysqlnd       \
+        --enable-swoole-sqlite \
+        --enable-brotli        \
+        --enable-openssl       \
+        --enable-sockets    && \
+    docker-php-ext-install -j$(nproc) swoole && \
+    rm -f swoole.tar.gz \
     ; \
     runDeps="$( \
         scanelf --needed --nobanner --format '%n#p' --recursive /usr/local \
@@ -310,23 +328,17 @@ RUN set -xe \
     && php artisan storage:link \
     && exa --all --group --header --links --long --accessed --modified --git --icons --color=always
 
-COPY --chown=$USER_NAME:$USER_NAME --from=server /usr/local/bin/frankenphp /usr/local/bin/frankenphp
-COPY --from=server /usr/local/lib/libwatcher* /usr/local/lib
-
-RUN sudo setcap cap_net_bind_service=+eip /usr/local/bin/frankenphp
-
 RUN set -xe \
     && PHP_ERROR="$( php -v 2>&1 1>/dev/null )" \
     && if [ -n "$PHP_ERROR" ]; then echo "$PHP_ERROR"; false; fi \
     && php -m; php -v; php --ini \
     && php -i | grep -E '^opcache\.(enable_cli|jit|jit_buffer_size) ' \
-    && composer --version \
-    && frankenphp version
+    && composer --version
 
 VOLUME ${LOG_PATH}
 
 ENTRYPOINT ["/sbin/tini", "--", "/entrypoint.sh"]
 
-EXPOSE 80 443 443/udp 2019 9111 8000
+EXPOSE 80 443 443/udp 9111 8000
 
 # vim:set ft=dockerfile:
