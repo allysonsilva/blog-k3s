@@ -14,7 +14,7 @@ stringData:
   APP_URL: "https://${APP_DOMAIN}/"
   APP_HOSTNAME: "$APP_DOMAIN"
 
-  # OCTANE_SERVER: frankenphp
+  # OCTANE_SERVER: swoole
   OCTANE_HTTPS: "true"
 
   LOG_CHANNEL: "stderr"

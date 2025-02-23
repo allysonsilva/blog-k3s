@@ -1,6 +1,6 @@
 [program:laravel-octane]
 process_name=%(program_name)s
-command=php -d variables_order=EGPCS artisan octane:frankenphp --host=0.0.0.0 --admin-port=2019 --port=8000 --env=%(ENV_APP_ENV)s
+command=php -d variables_order=EGPCS artisan octane:swoole --host=0.0.0.0 --admin-port=2019 --port=8000 --env=%(ENV_APP_ENV)s
 directory=%(ENV_REMOTE_SRC)s
 user=%(ENV_USER_NAME)s
 autostart=true

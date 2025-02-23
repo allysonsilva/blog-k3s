@@ -39,7 +39,6 @@ configure_php_ini() {
     \
     $PHP_INI_DIR/php.ini
 
-    # # @see https://github.com/dunglas/frankenphp/issues/309
     # sed -i \
     #     -e '/opcache.jit_buffer_size/s/^; //g' \
     #     -e '/opcache.jit/s/^; //g' \
