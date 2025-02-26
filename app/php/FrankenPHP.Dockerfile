@@ -71,7 +71,22 @@ RUN set -xe; \
     \
     apk update; \
     \
-    apk add --no-cache --virtual .phpize-deps $PHPIZE_DEPS && \
+    apk add --no-cache --virtual .phpize-deps \
+        $PHPIZE_DEPS \
+        curl-dev \
+        linux-headers \
+        brotli-dev \
+        openssl-dev \
+        pcre-dev \
+        sqlite-dev \
+        icu-dev \
+        pcre2-dev \
+        zlib-dev \
+        rabbitmq-c-dev \
+    ; \
+    apk add --no-cache libstdc++ \
+    ; \
+    pecl channel-update pecl.php.net && \
     docker-php-ext-configure mysqli --with-mysqli=mysqlnd && \
     docker-php-ext-configure pdo_mysql --with-pdo-mysql=mysqlnd && \
     install-php-extensions \

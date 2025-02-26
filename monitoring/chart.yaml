@@ -1,0 +1,107 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: monitoring
+---
+apiVersion: helm.cattle.io/v1
+kind: HelmChart
+metadata:
+  name: prometheus-stack
+  namespace: kube-system
+spec:
+  chart: kube-prometheus-stack
+  repo: https://prometheus-community.github.io/helm-charts
+  targetNamespace: monitoring
+  version: 62.7.0
+  valuesContent: |-
+    fullnameOverride: prometheus
+
+    kubeEtcd:
+      enabled: false
+
+    kubeStateMetrics:
+      enabled: true
+
+    kubeControllerManager:
+      enabled: true
+      endpoints:
+        - $PRIVATE_IP
+      service:
+        enabled: true
+        port: 10257
+        targetPort: 10257
+      serviceMonitor:
+        enabled: true
+        https: true
+
+    kubeScheduler:
+      enabled: true
+      endpoints:
+        - $PRIVATE_IP
+      service:
+        enabled: true
+        port: 10259
+        targetPort: 10259
+      serviceMonitor:
+        enabled: true
+        https: true
+
+    kubeProxy:
+      enabled: true
+      endpoints:
+        - $PRIVATE_IP
+      service:
+        enabled: true
+        port: 10249
+        targetPort: 10249
+
+    alertmanager:
+      enabled: true
+      fullnameOverride: alertmanager
+      ingress:
+        enabled: false
+      alertmanagerSpec:
+        storage:
+          volumeClaimTemplate:
+            spec:
+              storageClassName: local-path
+              accessModes: ["ReadWriteOnce"]
+              resources:
+                requests:
+                  storage: 1G
+
+    prometheus:
+      prometheusSpec:
+        replicas: 1
+        retention: 1d
+        enableAdminAPI: true
+        walCompression: true
+        scrapeInterval: 5s
+        evaluationInterval: 5s
+        ruleSelectorNilUsesHelmValues: false
+        serviceMonitorSelectorNilUsesHelmValues: false
+        podMonitorSelectorNilUsesHelmValues: false
+        probeSelectorNilUsesHelmValues: false
+        storageSpec:
+          volumeClaimTemplate:
+            spec:
+              storageClassName: local-path
+              accessModes: ["ReadWriteOnce"]
+              resources:
+                requests:
+                  storage: 5Gi
+
+    grafana:
+      enabled: true
+      fullnameOverride: grafana
+      forceDeployDatasources: false
+      forceDeployDashboards: false
+      defaultDashboardsEnabled: true
+      defaultDashboardsTimezone: browser
+      adminPassword: adminG
+      persistence:
+        type: pvc
+        enabled: true
+        storageClassName: local-path
+        accessModes: ["ReadWriteOnce"]
+        size: 1024Mi

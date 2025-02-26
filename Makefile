@@ -60,7 +60,6 @@ docker/config-env:
 	@sed -i "/^# CURRENT_UID/c\CURRENT_UID=${current_uid}" .env
 	@cp ./mysql/.env.container ./mysql/.env
 	@cp ./soketi/.env.container ./soketi/.env
-	@cp ./app/.env.container ./app/.env
 	@echo
 	@echo -e $(call message_success, Run \`make docker/config-env\` successfully executed)
 

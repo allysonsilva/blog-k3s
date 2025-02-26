@@ -1,0 +1,25 @@
+apiVersion: helm.cattle.io/v1
+kind: HelmChart
+metadata:
+  name: prometheus-mysql-exporter
+  namespace: kube-system
+spec:
+  repo: https://prometheus-community.github.io/helm-charts
+  chart: prometheus-mysql-exporter
+  targetNamespace: monitoring
+  version: 2.6.1
+  valuesContent: |-
+    replicaCount: 1
+    serviceMonitor:
+      # enabled should be set to true to enable prometheus-operator discovery of this service
+      enabled: true
+      interval: 10s
+      namespace: monitoring
+      additionalLabels:
+        release: prometheus-stack
+    # mysql connection params which build the my.cnf config
+    mysql:
+      host: "mysql.database.svc"
+      pass: "$MYSQL_MONITORING_PASSWORD"
+      port: 3306
+      user: "exporter"
