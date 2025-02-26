@@ -15,7 +15,8 @@ ENV COMPOSER_HOME /composer
 
 ARG APP_FOLDER
 
-COPY $APP_FOLDER .
+COPY $APP_FOLDER/composer.json .
+COPY $APP_FOLDER/composer.lock .
 
 RUN set -xe \
     &&  composer install \
@@ -25,6 +26,7 @@ RUN set -xe \
         --no-progress \
         --no-dev \
         --no-cache \
+        --no-scripts \
         --no-interaction \
         --ansi
 
@@ -292,12 +294,18 @@ RUN set -xe \
 ENV PATH="$PATH:/home/${USER_NAME}/.composer/vendor/bin"
 
 # Files APP
-COPY --chown=${USER_NAME}:${USER_NAME} --from=vendor /app/ $REMOTE_SRC
+# Copy our application
+COPY $APP_FOLDER $REMOTE_SRC
+
+## Copy the downloaded dependencies from the {vendor} stage
+COPY --chown=${USER_NAME}:${USER_NAME} --from=vendor /app/vendor $REMOTE_SRC/vendor
 COPY --chown=${USER_NAME}:${USER_NAME} --from=frontend /app/node_modules $REMOTE_SRC/node_modules
 
 RUN sudo mkdir -p   storage/logs \
                     storage/app/public \
-                    storage/framework/{sessions,views,cache}
+                    storage/framework/{sessions,views,cache} \
+                    ; \
+                    sudo touch storage/logs/laravel.log
 
 RUN set -xe \
     && echo "---> Changing Permissions" \
@@ -309,6 +317,12 @@ RUN set -xe \
         /home/${USER_NAME} \
         $LOG_PATH \
         /tmp/php
+
+RUN set -xe \
+    && sudo composer run-script post-root-package-install || true \
+    && sudo composer run-script post-create-project-cmd || true \
+    # && composer dump-autoload --optimize --classmap-authoritative --no-dev --ansi || true \
+    && sudo composer run-script post-autoload-dump || true
 
 RUN set -xe \
     && DEFAULT_PARAMETERS_FD="--threads $(nproc) --hidden --no-ignore --ignore-case --show-errors" \
@@ -325,7 +339,7 @@ RUN set -xe \
     && php artisan view:clear \
     && php artisan route:clear \
     && php artisan config:clear \
-    && php artisan storage:link \
+    # && php artisan storage:link \
     && exa --all --group --header --links --long --accessed --modified --git --icons --color=always
 
 RUN set -xe \

@@ -17,6 +17,7 @@ spec:
   entryPoints:
     - websecure
   routes:
+  # kubectl get secret admin-user-secret -n kubernetes-dashboard -o jsonpath={".data.token"} | base64 -d
   - match: Host(`k8s-dashboard.$APP_DOMAIN`)
     kind: Rule
     services:
