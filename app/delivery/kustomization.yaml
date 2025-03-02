@@ -4,15 +4,15 @@ apiVersion: kustomize.config.k8s.io/v1beta1
 kind: Kustomization
 
 commonLabels:
-  version: v1
   env: production
+  version: v1
 
 # Without it, Kustomize will not know what to do with the rollout resource (kind=rollout).
 configurations:
 - https://argoproj.github.io/argo-rollouts/features/kustomize/rollout-transform-kustomize-v5.yaml
 
-resources:
 # ./scripts/env-to-file.sh --env=app/delivery/.env --file=app/delivery/config.example.yaml | kubeseal > app/delivery/credentials.yaml --format yaml
+resources:
 - credentials.yaml
 - rollout.yaml
 - service-active.yaml
@@ -24,8 +24,8 @@ generatorOptions:
 
 namespace: default
 
-images:
 # kustomize edit set image blog-image=newName:newTag
+images:
 - name: blog-image
-  newName: "ewr.vultrcr.com/blog/app"
-  newTag: "6.0"
+  newName: ewr.vultrcr.com/blog/app
+  newTag: 69ccfd68a40d313496ef910193c9839157f72255
