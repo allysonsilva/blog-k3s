@@ -1,0 +1,17 @@
+# ./scripts/env-to-file.sh --file=traefik/metrics-ingress.yaml | k apply -f -
+# Ativar apenas para debug - não deve ser/estar disponível na web!
+apiVersion: traefik.io/v1alpha1
+kind: IngressRoute
+metadata:
+  name: traefik-metrics
+  namespace: traefik
+spec:
+  entryPoints:
+    - websecure
+  routes:
+    - kind: Rule
+      match: Host(`traefik.$APP_DOMAIN`) && PathPrefix(`/metrics`)
+      priority: 99
+      services:
+        - name: prometheus@internal
+          kind: TraefikService

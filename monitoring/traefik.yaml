@@ -8,6 +8,9 @@ metadata:
     release: prometheus-stack
 spec:
   # jobLabel: traefik-metrics
+  #
+  # A seção "endpoints" especifica que desejamos monitorar o endpoint "metrics" exposto pelo serviço e que as métricas estão disponíveis no caminho "/metrics".
+  # O intervalo de coleta de métricas é definido como 5 segundos.
   endpoints:
   - port: metrics
     path: /metrics
@@ -15,6 +18,7 @@ spec:
   namespaceSelector:
     matchNames:
       - kube-system
+  # O seletor "matchLabels" é usado para encontrar o serviço que desejamos monitorar com a label "app.kubernetes.io/name".
   selector:
     matchLabels:
       app.kubernetes.io/name: traefik
