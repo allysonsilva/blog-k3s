@@ -335,7 +335,7 @@ RUN set -xe \
     # -E "{folderX,folderY}"
     && sudo fd $DEFAULT_EXCLUDE_FD $DEFAULT_PARAMETERS_FD --type directory --exec chmod 755 {} \; . $REMOTE_SRC \
     && sudo fd $DEFAULT_EXCLUDE_FD $DEFAULT_PARAMETERS_FD --type file --exec chmod 644 {} \; . $REMOTE_SRC \
-    && sudo fd -E .git -E vendor -E node_modules $DEFAULT_PARAMETERS_FD chown $USER_NAME:$USER_NAME . $REMOTE_SRC \
+    && sudo fd -E .git -E vendor -E node_modules $DEFAULT_PARAMETERS_FD --exec chown $USER_NAME:$USER_NAME . $REMOTE_SRC \
     && sudo chgrp -R $USER_NAME storage bootstrap/cache \
     && sudo chmod -R ug+rwx storage bootstrap/cache
 
@@ -343,7 +343,7 @@ RUN set -xe \
     && php artisan view:clear \
     && php artisan route:clear \
     && php artisan config:clear \
-    # && php artisan storage:link \
+    && php artisan storage:link \
     && exa --all --group --header --links --long --accessed --modified --git --icons --color=always
 
 RUN set -xe \
