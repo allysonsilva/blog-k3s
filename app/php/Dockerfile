@@ -279,11 +279,6 @@ WORKDIR $REMOTE_SRC
 # Define the running USER
 USER $USER_NAME
 
-# Remove folder docker
-RUN     if [ -d ${K3S_FOLDER} ]; then \
-            sudo rm -rf ${K3S_FOLDER} \
-        ;fi
-
 COPY --chown=${USER_NAME}:${USER_NAME} --from=vendor /usr/bin/composer /usr/local/bin/composer
 
 RUN set -xe \
@@ -309,6 +304,11 @@ RUN sudo mkdir -p   storage/logs \
                     storage/framework/{sessions,views,cache} \
                     ; \
                     sudo touch storage/logs/laravel.log
+
+# Remove folder docker
+RUN     if [ -d ${K3S_FOLDER} ]; then \
+            sudo rm -rf ${K3S_FOLDER} \
+        ;fi
 
 RUN set -xe \
     && echo "---> Changing Permissions" \
