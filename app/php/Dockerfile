@@ -170,7 +170,10 @@ LABEL org.opencontainers.image.source=https://github.com/allysonsilva/blog-k3s
 LABEL org.opencontainers.image.licenses=MIT
 
 ARG APP_FOLDER
+ENV APP_FOLDER $APP_FOLDER
+
 ARG K3S_FOLDER
+ENV K3S_FOLDER $K3S_FOLDER
 
 # = /usr/local/etc/php
 ENV PHP_INI_DIR ${PHP_INI_DIR:-/usr/local/etc/php}
@@ -278,7 +281,7 @@ USER $USER_NAME
 
 # Remove folder docker
 RUN     if [ -d ${K3S_FOLDER} ]; then \
-            rm -rf ${K3S_FOLDER} \
+            sudo rm -rf ${K3S_FOLDER} \
         ;fi
 
 COPY --chown=${USER_NAME}:${USER_NAME} --from=vendor /usr/bin/composer /usr/local/bin/composer
@@ -332,6 +335,7 @@ RUN set -xe \
     # -E "{folderX,folderY}"
     && sudo fd $DEFAULT_EXCLUDE_FD $DEFAULT_PARAMETERS_FD --type directory --exec chmod 755 {} \; . $REMOTE_SRC \
     && sudo fd $DEFAULT_EXCLUDE_FD $DEFAULT_PARAMETERS_FD --type file --exec chmod 644 {} \; . $REMOTE_SRC \
+    && sudo fd -E .git -E vendor -E node_modules $DEFAULT_PARAMETERS_FD chown $USER_NAME:$USER_NAME . $REMOTE_SRC \
     && sudo chgrp -R $USER_NAME storage bootstrap/cache \
     && sudo chmod -R ug+rwx storage bootstrap/cache
 
