@@ -66,19 +66,6 @@ install_composer_dependencies() {
     fi
 }
 
-common_entrypoint() {
-    php artisan app:generate-feed || true
-    php artisan app:generate-sitemap || true
-
-    npm --section=site run mix-production || true
-
-    php artisan app:generate-partials-shell --no-interaction || true
-
-    npm run workbox-precache || true
-
-    npm --section=combine run mix-production || true
-}
-
 # $> {view:clear} && {cache:clear} && {route:clear} && {config:clear} && {clear-compiled}
 # @see https://github.com/laravel/framework/blob/9.x/src/Illuminate/Foundation/Console/OptimizeClearCommand.php
 if [[ -d "vendor" && ${FORCE_CLEAR:-true} == true ]]; then
@@ -91,12 +78,6 @@ if [[ -d "vendor" && ${FORCE_CLEAR:-true} == true ]]; then
     php artisan clear-compiled
 fi
 
-if [[ -d "vendor" && ${CACHE_CLEAR:-false} == true ]]; then
-    printf "\n\033[33mLaravel - artisan cache:clear\033[0m\n\n"
-
-    php artisan cache:clear 2>/dev/null || true
-fi
-
 if [[ -d "vendor" && ${FORCE_OPTIMIZE:-true} == true ]]; then
     printf "\n\033[33mLaravel Cache Optimization - artisan config:cache + route:cache + view:cache\033[0m\n\n"
 
@@ -105,12 +86,6 @@ if [[ -d "vendor" && ${FORCE_OPTIMIZE:-true} == true ]]; then
     php artisan optimize || true
     php artisan view:cache || true
     php artisan event:cache || true
-fi
-
-if [[ -d "vendor" && ${FORCE_MIGRATE:-false} == true ]]; then
-    printf "\n\033[33mLaravel - artisan migrate --force\033[0m\n\n"
-
-    php artisan migrate --force || true
 fi
 
 if [[ ${FORCE_STORAGE_LINK:-true} == true ]]; then
@@ -137,8 +112,6 @@ echo
 php --ini
 
 if [ "$CONTAINER_ROLE" = "APP" ]; then
-    common_entrypoint
-
     printf "\033[34m[$CONTAINER_ROLE] Running with Laravel Octane ...\033[0m\n"
 
     sudo mv /etc/supervisor/conf.d/laravel-octane.conf.tpl /etc/supervisor/conf.d/laravel-octane.conf

@@ -2,6 +2,7 @@ ARG APP_FOLDER=.
 ARG COMPOSER_VERSION=2.7
 ARG K3S_FOLDER=./k3s
 ARG PHP_BASE_IMAGE_VERSION=8.4-zts-alpine
+ARG APP_ENTRYPOINT_FILE=docker-entrypoint.sh
 
 #####
 ## COMPOSER
@@ -265,10 +266,6 @@ RUN set -xe; \
     \
     touch /var/spool/cron/crontabs/$USER_NAME
 
-# ENTRYPOINT
-COPY $APP_BUILD_CONTAINER_PATH/docker-entrypoint.sh /entrypoint.sh
-RUN chmod +x /entrypoint.sh
-
 #####
 ## APPLICATION
 #####
@@ -354,6 +351,12 @@ RUN set -xe \
     && composer --version
 
 VOLUME ${LOG_PATH}
+
+ARG APP_ENTRYPOINT_FILE
+
+# ENTRYPOINT
+COPY $APP_BUILD_CONTAINER_PATH/$APP_ENTRYPOINT_FILE /entrypoint.sh
+RUN sudo chmod +x /entrypoint.sh
 
 ENTRYPOINT ["/sbin/tini", "--", "/entrypoint.sh"]
 
