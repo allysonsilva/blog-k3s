@@ -28,4 +28,4 @@ namespace: default
 images:
 - name: blog-image
   newName: ewr.vultrcr.com/blog/app
-  newTag: 817b99203599b630196d1dcbb53edf91b7a435d1
+  newTag: b442cfcc81e649db74cb7c2823e065847f84f786
