@@ -13,17 +13,29 @@ metadata:
 spec:
   imagePullSecrets:
     - name: vultr-cr-credentials
+  volumes:
+    - name: public-storage
+      persistentVolumeClaim:
+        claimName: blog-public-pvc
   containers:
     - name: app-blog-pre-sync
       image: blog-image-pre-sync
       imagePullPolicy: IfNotPresent
-      # resources:
-      #   requests:
-      #     cpu: "500m"
-      #     memory: "128Mi"
-      #   limits:
-      #     cpu: "1"
-      #     memory: "512Mi"
+      resources:
+        requests:
+          cpu: "500m"
+          memory: "128Mi"
+        limits:
+          cpu: "1"
+          memory: "512Mi"
+      args:
+        - /bin/sh
+        - -c
+        - |-
+          mkdir -p /var/www/app/public-pre-sync/
+          # rsync -av --no-links --delete ./public/ /var/www/app/public-pre-sync/
+          cp -r ./public/* /var/www/app/public-pre-sync/
+          exit 0
       # Note:
       # The command field corresponds to ENTRYPOINT,
       # and the args field corresponds to CMD in some container runtimes.
@@ -38,11 +50,7 @@ spec:
       envFrom:
         - secretRef:
             name: app-environment-configs
-      # volumeMounts:
-      #   - name: public-storage
-      #     mountPath: /var/www/app/public
-  # volumes:
-  #   - name: public-storage
-  #     persistentVolumeClaim:
-  #       claimName: blog-public-pvc
+      volumeMounts:
+        - name: public-storage
+          mountPath: /var/blog/public
   restartPolicy: Never

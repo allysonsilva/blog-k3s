@@ -28,6 +28,10 @@ spec:
     spec:
       imagePullSecrets:
         - name: vultr-cr-credentials
+      volumes:
+        - name: public-storage
+          persistentVolumeClaim:
+            claimName: blog-public-pvc
       containers:
         - name: app-blog
           image: blog-image
@@ -59,7 +63,3 @@ spec:
               # Possible values are `Enabled`, `IfPossible`, and `Disabled`.
               # Needs to be specified in conjunction with `readOnly: true`.
               recursiveReadOnly: Enabled
-      volumes:
-        - name: public-storage
-          persistentVolumeClaim:
-            claimName: blog-public-pvc
