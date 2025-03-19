@@ -11,3 +11,5 @@ spec:
       - "*"
     accessControlAllowOriginList:
       - "*"
+    customResponseHeaders:
+      Access-Control-Allow-Origin: "*"
