@@ -17,8 +17,6 @@ spec:
       middlewares:
         - name: security
           namespace: default
-        - name: cors-assets
-          namespace: default
 ---
 apiVersion: traefik.io/v1alpha1
 kind: IngressRoute
@@ -37,6 +35,4 @@ spec:
           passHostHeader: true
       middlewares:
         - name: security
-          namespace: default
-        - name: cors-assets
           namespace: default
