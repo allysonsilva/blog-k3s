@@ -28,25 +28,6 @@ spec:
     spec:
       imagePullSecrets:
         - name: vultr-cr-credentials
-      initContainers:
-        - name: app-blog-migration
-          image: blog-image
-          # Note:
-          # The command field corresponds to ENTRYPOINT,
-          # and the args field corresponds to CMD in some container runtimes.
-          command:
-            - php
-          args:
-            - artisan
-            - migrate:status
-          env:
-            - name: CONTAINER_ROLE
-              value: "CUSTOM"
-            - name: FORCE_MIGRATE
-              value: 'true'
-          envFrom:
-            - secretRef:
-                name: app-environment-configs
       containers:
         - name: app-blog
           image: blog-image
@@ -63,8 +44,6 @@ spec:
           env:
             - name: CONTAINER_ROLE
               value: "APP"
-            - name: FORCE_MIGRATE
-              value: 'false'
             - name: PHP_MEMORY_LIMIT
               value: "256M"
             - name: PHP_MAX_EXECUTION_TIME
@@ -72,3 +51,15 @@ spec:
           envFrom:
             - secretRef:
                 name: app-environment-configs
+          volumeMounts:
+            - name: public-storage
+              mountPath: /var/www/app/public
+              readOnly: true
+              # NEW
+              # Possible values are `Enabled`, `IfPossible`, and `Disabled`.
+              # Needs to be specified in conjunction with `readOnly: true`.
+              recursiveReadOnly: Enabled
+      volumes:
+        - name: public-storage
+          persistentVolumeClaim:
+            claimName: blog-public-pvc

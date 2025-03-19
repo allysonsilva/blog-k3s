@@ -14,6 +14,8 @@ configurations:
 # ./scripts/env-to-file.sh --env=app/delivery/.env --file=app/delivery/config.example.yaml | kubeseal > app/delivery/credentials.yaml --format yaml
 resources:
 - credentials.yaml
+- public-pvc.yaml
+- pre-sync.yaml
 - rollout.yaml
 - service-active.yaml
 - service-preview.yaml

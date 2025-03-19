@@ -1,0 +1,47 @@
+# @see https://argo-cd.readthedocs.io/en/stable/user-guide/resource_hooks/
+apiVersion: v1
+kind: Pod
+metadata:
+  name: blog-pre-sync
+  labels:
+    app: blog-pre-sync
+  annotations:
+    argocd.argoproj.io/hook: PreSync
+    argocd.argoproj.io/hook-delete-policy: HookSucceeded
+    # argocd.argoproj.io/sync-wave: "1"
+spec:
+  imagePullSecrets:
+    - name: vultr-cr-credentials
+  containers:
+    - name: app-blog-pre-sync
+      image: blog-image
+      imagePullPolicy: IfNotPresent
+      # Note:
+      # The command field corresponds to ENTRYPOINT,
+      # and the args field corresponds to CMD in some container runtimes.
+      command:
+        - php
+      args:
+        - artisan
+        - migrate:status
+      env:
+        - name: FORCE_MIGRATE
+          value: 'true'
+      envFrom:
+        - secretRef:
+          name: app-environment-configs
+      resources:
+        requests:
+          cpu: 500m
+          memory: 128Mi
+        limits:
+          cpu: 1
+          memory: 512Mi
+      volumeMounts:
+        - name: public-storage
+          mountPath: /var/www/app/public
+  volumes:
+    - name: public-storage
+      persistentVolumeClaim:
+        claimName: blog-public-pvc
+  restartPolicy: Never
