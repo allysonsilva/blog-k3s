@@ -52,5 +52,5 @@ spec:
             name: app-environment-configs
       volumeMounts:
         - name: public-storage
-          mountPath: /var/blog/public
+          mountPath: /var/www/app/public-pre-sync
   restartPolicy: Never
