@@ -38,11 +38,11 @@ spec:
       envFrom:
         - secretRef:
             name: app-environment-configs
-      volumeMounts:
-        - name: public-storage
-          mountPath: /var/www/app/public
-  volumes:
-    - name: public-storage
-      persistentVolumeClaim:
-        claimName: blog-public-pvc
+      # volumeMounts:
+      #   - name: public-storage
+      #     mountPath: /var/www/app/public
+  # volumes:
+  #   - name: public-storage
+  #     persistentVolumeClaim:
+  #       claimName: blog-public-pvc
   restartPolicy: Never
