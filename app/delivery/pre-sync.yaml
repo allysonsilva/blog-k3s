@@ -3,6 +3,7 @@ apiVersion: v1
 kind: Pod
 metadata:
   name: blog-pre-sync
+  # namespace: default
   labels:
     app: blog-pre-sync
   annotations:
@@ -16,6 +17,13 @@ spec:
     - name: app-blog-pre-sync
       image: blog-image
       imagePullPolicy: IfNotPresent
+      # resources:
+      #   requests:
+      #     cpu: "500m"
+      #     memory: "128Mi"
+      #   limits:
+      #     cpu: "1"
+      #     memory: "512Mi"
       # Note:
       # The command field corresponds to ENTRYPOINT,
       # and the args field corresponds to CMD in some container runtimes.
@@ -29,14 +37,7 @@ spec:
           value: 'true'
       envFrom:
         - secretRef:
-          name: app-environment-configs
-      resources:
-        requests:
-          cpu: 500m
-          memory: 128Mi
-        limits:
-          cpu: 1
-          memory: 512Mi
+            name: app-environment-configs
       volumeMounts:
         - name: public-storage
           mountPath: /var/www/app/public
