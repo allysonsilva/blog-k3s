@@ -27,11 +27,11 @@ spec:
       # Note:
       # The command field corresponds to ENTRYPOINT,
       # and the args field corresponds to CMD in some container runtimes.
-      command:
-        - php
-      args:
-        - artisan
-        - migrate:status
+      # command:
+      #   - php
+      # args:
+      #   - artisan
+      #   - migrate:status
       env:
         - name: FORCE_MIGRATE
           value: 'true'
