@@ -88,13 +88,6 @@ if [[ -d "vendor" && ${FORCE_OPTIMIZE:-true} == true ]]; then
     php artisan event:cache || true
 fi
 
-if [[ ${FORCE_STORAGE_LINK:-true} == true ]]; then
-    printf "\n\033[33mLaravel - artisan storage:link\033[0m\n\n"
-
-    rm -rf ${REMOTE_SRC}/public/storage || true
-    php artisan storage:link || true
-fi
-
 if [[ ${OPCACHE_ENABLED:-true} == false ]]; then
     rm -f ${PHP_INI_SCAN_DIR}/opcache.ini >/dev/null 2>&1 || true
     rm -f ${PHP_INI_SCAN_DIR}/docker-php-ext-opcache.ini >/dev/null 2>&1 || true

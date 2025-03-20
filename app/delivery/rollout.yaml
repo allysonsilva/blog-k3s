@@ -58,8 +58,8 @@ spec:
           volumeMounts:
             - name: public-storage
               mountPath: /var/www/app/public
-              # readOnly: true
-              # # NEW
-              # # Possible values are `Enabled`, `IfPossible`, and `Disabled`.
-              # # Needs to be specified in conjunction with `readOnly: true`.
-              # recursiveReadOnly: Enabled
+              readOnly: true
+              # NEW
+              # Possible values are `Enabled`, `IfPossible`, and `Disabled`.
+              # Needs to be specified in conjunction with `readOnly: true`.
+              recursiveReadOnly: Enabled
