@@ -30,7 +30,7 @@ namespace: default
 images:
 - name: blog-image
   newName: ewr.vultrcr.com/blog/app
-  newTag: 8e95d5c23ec21d9cac186c15020dc848749f84dc
+  newTag: 5bc80d9963a5e6ee62bab2629d8b5dcea5d51c70
 - name: blog-image-pre-sync
   newName: ewr.vultrcr.com/blog/app
   newTag: init
