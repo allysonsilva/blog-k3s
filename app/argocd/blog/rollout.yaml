@@ -6,7 +6,7 @@ kind: Rollout
 metadata:
   name: blog-rollout
   labels:
-    app: blog
+    app: blog # Só é executado depois que o PreSync termina!
 spec:
   strategy:
     blueGreen:
@@ -14,7 +14,13 @@ spec:
       previewService: blog-preview
       previewReplicaCount: 2
       scaleDownDelayRevisionLimit: 1
-      autoPromotionEnabled: false
+      autoPromotionEnabled: true
+      prePromotionAnalysis:
+        templates:
+          - templateName: preview-health-check
+        args:
+          - name: preview-url
+            value: http://blog-preview.default.svc.cluster.local
   replicas: 5
   revisionHistoryLimit: 2
   minReadySeconds: 30

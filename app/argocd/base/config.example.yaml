@@ -1,4 +1,4 @@
-# ./scripts/env-to-file.sh --env=app/delivery/.env --file=app/delivery/config.example.yaml | kubeseal > app/delivery/credentials.yaml --format yaml
+# ./scripts/env-to-file.sh --env=app/argocd/base/.env --file=app/argocd/base/config.example.yaml | kubeseal > app/argocd/base/credentials.yaml --format yaml
 apiVersion: v1
 kind: Secret
 metadata:

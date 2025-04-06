@@ -1,0 +1,25 @@
+# ./scripts/env-to-file.sh --file=app/argocd/queue-worker/application.yaml | k apply -f -
+# k describe application.argoproj.io --namespace argocd queue-worker
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: queue-worker
+  namespace: argocd
+  finalizers:
+  - resources-finalizer.argocd.argoproj.io
+spec:
+  project: default
+  destination:
+    namespace: default
+    server: https://kubernetes.default.svc
+  source:
+    path: app/argocd/queue-worker
+    repoURL: https://github.com/allysonsilva/blog-k3s
+    targetRevision: HEAD
+    plugin:
+      name: envsubst
+      env:
+        - name: DOMAIN
+          value: ${APP_DOMAIN}
+  # Disable autosync in application spec:
+  syncPolicy: {}

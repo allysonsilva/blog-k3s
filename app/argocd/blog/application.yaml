@@ -1,5 +1,5 @@
-# ./scripts/env-to-file.sh --file=app/delivery/application.yaml | k apply -f -
-# k describe application.argoproj.io --namespace argocd default
+# ./scripts/env-to-file.sh --file=app/argocd/blog/application.yaml | k apply -f -
+# k describe application.argoproj.io --namespace argocd blog
 apiVersion: argoproj.io/v1alpha1
 kind: Application
 metadata:
@@ -13,7 +13,7 @@ spec:
     namespace: default
     server: https://kubernetes.default.svc
   source:
-    path: app/delivery
+    path: app/argocd/blog
     repoURL: https://github.com/allysonsilva/blog-k3s
     targetRevision: HEAD
     plugin:
@@ -22,4 +22,4 @@ spec:
         - name: DOMAIN
           value: ${APP_DOMAIN}
   # Disable autosync in application spec:
-  syncPolicy: null
+  syncPolicy: {}
