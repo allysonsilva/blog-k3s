@@ -6,9 +6,9 @@ kind: Kustomization
 labels:
 - includeSelectors: true
   pairs:
+    app: blog
     env: production
     version: v1
-    app: blog
 
 # Without it, Kustomize will not know what to do with the rollout resource (kind=rollout).
 configurations:
@@ -32,7 +32,7 @@ resources:
 images:
 - name: blog-image
   newName: ewr.vultrcr.com/blog/app
-  newTag: 20321ea
+  newTag: 068b9c2
 - name: blog-image-pre-sync
   newName: ewr.vultrcr.com/blog/app
-  newTag: init-20321ea
+  newTag: init-068b9c2
