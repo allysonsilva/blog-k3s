@@ -1,57 +1,57 @@
 # @see https://argo-cd.readthedocs.io/en/stable/user-guide/resource_hooks/
-apiVersion: batch/v1
-kind: Job
+apiVersion: v1
+kind: Pod
 metadata:
   name: blog-pre-sync
+  # namespace: default
   labels:
     app: blog-pre-sync
   annotations:
     argocd.argoproj.io/hook: PreSync
     argocd.argoproj.io/hook-delete-policy: BeforeHookCreation
+    # argocd.argoproj.io/sync-wave: "1"
 spec:
-  backoffLimit: 3
-  template:
-    spec:
-      imagePullSecrets:
-        - name: vultr-cr-credentials
-      volumes:
+  restartPolicy: OnFailure
+  maxRetries: 3
+  imagePullSecrets:
+    - name: vultr-cr-credentials
+  volumes:
+    - name: public-storage
+      persistentVolumeClaim:
+        claimName: blog-public-pvc
+  containers:
+    - name: app-blog-pre-sync
+      image: blog-image-pre-sync
+      imagePullPolicy: IfNotPresent
+      resources:
+        requests:
+          cpu: "500m"
+          memory: "128Mi"
+        limits:
+          cpu: "1"
+          memory: "512Mi"
+      args:
+        - /bin/sh
+        - -c
+        - |-
+          mkdir -p /var/www/app/public-pre-sync/
+          # rsync -av --no-links --delete ./public/ /var/www/app/public-pre-sync/
+          cp -r ./public/* /var/www/app/public-pre-sync/
+          exit 0
+      # Note:
+      # The command field corresponds to ENTRYPOINT,
+      # and the args field corresponds to CMD in some container runtimes.
+      # command:
+      #   - php
+      # args:
+      #   - artisan
+      #   - migrate:status
+      env:
+        - name: FORCE_MIGRATE
+          value: 'true'
+      envFrom:
+        - secretRef:
+            name: app-environment-configs
+      volumeMounts:
         - name: public-storage
-          persistentVolumeClaim:
-            claimName: blog-public-pvc
-      containers:
-        - name: app-blog-pre-sync
-          image: blog-image-pre-sync
-          imagePullPolicy: IfNotPresent
-          resources:
-            requests:
-              cpu: "500m"
-              memory: "128Mi"
-            limits:
-              cpu: "1"
-              memory: "512Mi"
-          args:
-            - /bin/sh
-            - -c
-            - |-
-              mkdir -p /var/www/app/public-pre-sync/
-              # rsync -av --no-links --delete ./public/ /var/www/app/public-pre-sync/
-              cp -r ./public/* /var/www/app/public-pre-sync/
-              exit 0
-          # Note:
-          # The command field corresponds to ENTRYPOINT,
-          # and the args field corresponds to CMD in some container runtimes.
-          # command:
-          #   - php
-          # args:
-          #   - artisan
-          #   - migrate:status
-          env:
-            - name: FORCE_MIGRATE
-              value: 'true'
-          envFrom:
-            - secretRef:
-                name: app-environment-configs
-          volumeMounts:
-            - name: public-storage
-              mountPath: /var/www/app/public-pre-sync
-      restartPolicy: Never
+          mountPath: /var/www/app/public-pre-sync
