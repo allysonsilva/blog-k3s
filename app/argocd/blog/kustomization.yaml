@@ -19,10 +19,10 @@ generatorOptions:
 
 namespace: default
 
+# - preview-health-check.yaml
 resources:
 - ../base
 - pre-sync.yaml
-# - preview-health-check.yaml
 - rollout.yaml
 - service-active.yaml
 - service-preview.yaml
@@ -32,7 +32,7 @@ resources:
 images:
 - name: blog-image
   newName: ewr.vultrcr.com/blog/app
-  newTag: 068b9c2
+  newTag: e45c3bd
 - name: blog-image-pre-sync
   newName: ewr.vultrcr.com/blog/app
-  newTag: init-068b9c2
+  newTag: init-e45c3bd
