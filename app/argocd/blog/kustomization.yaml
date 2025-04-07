@@ -6,7 +6,18 @@ kind: Kustomization
 labels:
 - includeSelectors: true
   pairs:
+    env: production
+    version: v1
     app: blog
+
+# Without it, Kustomize will not know what to do with the rollout resource (kind=rollout).
+configurations:
+- https://argoproj.github.io/argo-rollouts/features/kustomize/rollout-transform-kustomize-v5.yaml
+
+generatorOptions:
+  disableNameSuffixHash: true
+
+namespace: default
 
 resources:
 - ../base
