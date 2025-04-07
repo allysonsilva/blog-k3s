@@ -21,7 +21,3 @@ generatorOptions:
   disableNameSuffixHash: true
 
 namespace: default
-
-components:
-- ../components/blog-image
-- ../components/blog-pre-sync-image

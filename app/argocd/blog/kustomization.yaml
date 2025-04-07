@@ -16,3 +16,12 @@ resources:
 - service-active.yaml
 - service-preview.yaml
 - ingress.yaml
+
+# kustomize edit set image blog-image=newName:newTag
+images:
+  - name: blog-image
+    newName: ewr.vultrcr.com/blog/app
+    newTag: f0d49e22b1b5d44c752b3d2533db7d79b3cda2f1
+  - name: blog-image-pre-sync
+    newName: ewr.vultrcr.com/blog/app
+    newTag: init-f0d49e22b1b5d44c752b3d2533db7d79b3cda2f1
