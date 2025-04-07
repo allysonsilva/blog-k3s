@@ -22,7 +22,7 @@ namespace: default
 resources:
 - ../base
 - pre-sync.yaml
-- preview-health-check.yaml
+# - preview-health-check.yaml
 - rollout.yaml
 - service-active.yaml
 - service-preview.yaml
