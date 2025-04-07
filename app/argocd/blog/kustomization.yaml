@@ -21,7 +21,6 @@ resources:
 images:
 - name: blog-image
   newName: ewr.vultrcr.com/blog/app
-  newTag: 8d5bd12
 - name: blog-image-pre-sync
   newName: ewr.vultrcr.com/blog/app
-  newTag: init-8d5bd12
+  newTag: init-
