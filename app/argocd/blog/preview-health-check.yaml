@@ -13,7 +13,7 @@ spec:
       count: 12
       successCondition: result == 200
       # Especifica que são necessários 3 sucessos consecutivos para que a análise seja considerada bem-sucedida e a promoção ocorra.
-      consecutiveSuccesses: 3
+      consecutiveSuccessLimit: 3
       # Se você omitir o failureCondition, o Argo não vai saber o que conta como erro, e o failureLimit não terá efeito → o rollout pode nunca falhar, mesmo com respostas ruins.
       failureCondition: result != 200
       # Se tiver 3 falhas (em qualquer ordem), falha a análise, não é promovido!
@@ -21,5 +21,5 @@ spec:
       provider:
         web:
           url: "{{args.preview-url}}"
-          timeout: 5s
+          timeoutSeconds: 5
           jsonPath: '{.statusCode}'
