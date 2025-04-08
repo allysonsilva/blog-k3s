@@ -32,7 +32,7 @@ resources:
 images:
 - name: blog-image
   newName: ewr.vultrcr.com/blog/app
-  newTag: e45c3bd
+  newTag: dd15d3d
 - name: blog-image-pre-sync
   newName: ewr.vultrcr.com/blog/app
-  newTag: init-e45c3bd
+  newTag: init-dd15d3d
