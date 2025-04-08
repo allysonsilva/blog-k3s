@@ -20,7 +20,7 @@ spec:
           - templateName: preview-health-check
         args:
           - name: preview-url
-            value: http://blog-preview.default.svc.cluster.local
+            value: https://preview.alysonsilva.dev
   replicas: 5
   revisionHistoryLimit: 2
   minReadySeconds: 30

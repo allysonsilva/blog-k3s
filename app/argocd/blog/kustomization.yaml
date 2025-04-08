@@ -19,10 +19,10 @@ generatorOptions:
 
 namespace: default
 
-# - preview-health-check.yaml
 resources:
 - ../base
 - pre-sync.yaml
+- preview-health-check.yaml
 - rollout.yaml
 - service-active.yaml
 - service-preview.yaml
