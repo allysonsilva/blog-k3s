@@ -6,3 +6,4 @@ kind: Kustomization
 resources:
 - credentials.yaml
 - public-pvc.yaml
+- app-blog-pvc.yaml

@@ -15,6 +15,8 @@ spec:
       previewReplicaCount: 2
       scaleDownDelayRevisionLimit: 1
       autoPromotionEnabled: true
+      # Só começa a rodar depois que o novo ReplicaSet (preview) está pronto e os
+      # manifests foram aplicados com sucesso, mas antes de fazer a promoção pra produção.
       prePromotionAnalysis:
         templates:
           - templateName: preview-health-check
@@ -38,6 +40,9 @@ spec:
         - name: public-storage
           persistentVolumeClaim:
             claimName: blog-public-pvc
+        - name: app-blog-shared
+          persistentVolumeClaim:
+            claimName: app-blog-pvc
       containers:
         - name: app-blog
           image: blog-image
@@ -62,6 +67,8 @@ spec:
             - secretRef:
                 name: app-environment-configs
           volumeMounts:
+            - name: app-blog-shared
+              mountPath: /var/www/app
             - name: public-storage
               mountPath: /var/www/app/public
               readOnly: true

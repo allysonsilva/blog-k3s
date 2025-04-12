@@ -149,6 +149,7 @@ RUN set -xe; \
         nodejs \
         tzdata \
         libcap \
+        rsync \
         bind-tools \
         supervisor \
         mysql-client \
