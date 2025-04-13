@@ -1,0 +1,45 @@
+# @see https://fidelissauro.dev/argo-rollouts-qual-a-forma-mais-simples-de-executar-canary-releases-e-blue-green-deployments-no/
+# kubectl argo rollouts get rollout queue-worker-rollout
+# kubectl argo rollouts promote queue-worker-rollout
+apiVersion: argoproj.io/v1alpha1
+kind: Rollout
+metadata:
+  name: queue-worker-rollout
+  labels:
+    app: queue-worker
+spec:
+  replicas: 3
+  strategy:
+    blueGreen:
+      previewReplicaCount: 1
+      scaleDownDelayRevisionLimit: 1
+      autoPromotionEnabled: false
+  revisionHistoryLimit: 2
+  minReadySeconds: 30
+  selector:
+    matchLabels:
+      app: worker
+  template:
+    metadata:
+      labels:
+        app: worker
+    spec:
+      imagePullSecrets:
+        - name: vultr-cr-credentials
+      volumes:
+        - name: app-blog-shared
+          persistentVolumeClaim:
+            claimName: app-blog-pvc
+      containers:
+        - name: app-queue-worker
+          image: queue-worker-image
+          imagePullPolicy: IfNotPresent
+          env:
+            - name: CONTAINER_ROLE
+              value: "QUEUE"
+          envFrom:
+            - secretRef:
+                name: app-environment-configs
+          volumeMounts:
+            - name: app-blog-shared
+              mountPath: /var/www/app

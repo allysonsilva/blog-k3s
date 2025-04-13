@@ -40,19 +40,15 @@ spec:
           # fi
 
           if [ -d "$REMOTE_SRC" ]; then
-            echo
             echo "Copiando arquivos de $REMOTE_SRC para /app-data..."
             mkdir -p /app-data
             sudo rsync -a --chown=${USER_NAME}:${USER_NAME} "$REMOTE_SRC"/ /app-data/
             echo "Cópia concluída!"
-            echo
             # Cria o marcador
             # touch /app-data/.copied
             exit 0
           else
-            echo
             echo "Diretório $REMOTE_SRC não encontrado!"
-            echo
             exit 1
           fi
 
