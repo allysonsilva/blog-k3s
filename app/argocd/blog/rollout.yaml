@@ -37,9 +37,6 @@ spec:
       imagePullSecrets:
         - name: vultr-cr-credentials
       volumes:
-        - name: public-storage
-          persistentVolumeClaim:
-            claimName: blog-public-pvc
         - name: app-blog-shared
           persistentVolumeClaim:
             claimName: app-blog-pvc
@@ -69,10 +66,8 @@ spec:
           volumeMounts:
             - name: app-blog-shared
               mountPath: /var/www/app
-            - name: public-storage
-              mountPath: /var/www/app/public
-              readOnly: true
-              # NEW
-              # Possible values are `Enabled`, `IfPossible`, and `Disabled`.
-              # Needs to be specified in conjunction with `readOnly: true`.
-              recursiveReadOnly: Enabled
+              # readOnly: true
+              # # NEW
+              # # Possible values are `Enabled`, `IfPossible`, and `Disabled`.
+              # # Needs to be specified in conjunction with `readOnly: true`.
+              # recursiveReadOnly: Enabled
