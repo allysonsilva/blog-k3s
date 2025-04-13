@@ -16,12 +16,12 @@ spec:
   imagePullSecrets:
     - name: vultr-cr-credentials
   volumes:
-    - name: public-storage
+    - name: app-blog-shared
       persistentVolumeClaim:
-        claimName: blog-public-pvc
+        claimName: app-blog-pvc
   containers:
     - name: app-blog-pre-sync
-      image: blog-image-pre-sync
+      image: blog-image
       imagePullPolicy: IfNotPresent
       resources:
         requests:
@@ -33,11 +33,42 @@ spec:
       args:
         - /bin/sh
         - -c
-        - |-
-          mkdir -p /var/www/app/public-pre-sync/
-          # rsync -av --no-links --delete ./public/ /var/www/app/public-pre-sync/
-          cp -r ./public/* /var/www/app/public-pre-sync/
-          exit 0
+        - |
+          # if [ -f /app-data/.copied ]; then
+          #   echo "Arquivos já foram copiados anteriormente. Pulando..."
+          #   exit 0
+          # fi
+
+          if [ -d "$REMOTE_SRC" ]; then
+            echo "Copiando arquivos de $REMOTE_SRC para /app-data..."
+            mkdir -p /app-data
+            cp -r "$REMOTE_SRC"/* /app-data
+            echo "Cópia concluída!"
+            # Cria o marcador
+            # touch /app-data/.copied
+            exit 0
+          else
+            echo "Diretório $REMOTE_SRC não encontrado!"
+            exit 1
+          fi
+
+          # HASH_FILE="/app-data/.app_hash"
+          # CURRENT_HASH=$(find "$REMOTE_SRC" -type f -exec sha256sum {} + | sort | sha256sum | awk '{print $1}')
+
+          # if [ -f "$HASH_FILE" ]; then
+          #   PREVIOUS_HASH=$(cat "$HASH_FILE")
+          #   if [ "$CURRENT_HASH" = "$PREVIOUS_HASH" ]; then
+          #     echo "Nenhuma alteração detectada no conteúdo de $REMOTE_SRC. Pulando cópia."
+          #     exit 0
+          #   fi
+          # fi
+
+          # echo "Alterações detectadas. Copiando arquivos para /app-data..."
+          # mkdir -p /app-data
+          # cp -r "$REMOTE_SRC"/* /app-data
+
+          # echo "$CURRENT_HASH" > "$HASH_FILE"
+          # echo "Cópia concluída e hash atualizado."
       # Note:
       # The command field corresponds to ENTRYPOINT,
       # and the args field corresponds to CMD in some container runtimes.
@@ -48,10 +79,12 @@ spec:
       #   - migrate:status
       env:
         - name: FORCE_MIGRATE
-          value: 'true'
+          value: "true"
+        - name: IS_PRE_SYNC
+          value: "true"
       envFrom:
         - secretRef:
             name: app-environment-configs
       volumeMounts:
-        - name: public-storage
-          mountPath: /var/www/app/public-pre-sync
+        - name: app-blog-shared
+          mountPath: /app-data

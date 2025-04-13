@@ -12,23 +12,6 @@ if [ -z "$APP_ENV" ]; then
     exit 1
 fi
 
-if [ -z "$APP_KEY" ]; then
-    printf "\n\033[31m[$CONTAINER_ROLE] A \$APP_KEY environment is required to run this container!\033[0m\n"
-    exit 1
-fi
-
-shopt -s dotglob
-sudo chown -R ${USER_NAME}:${USER_NAME} \
-        /home/${USER_NAME} \
-        /usr/local/var/run \
-        /var/run \
-        /var/log \
-        /tmp/php \
-        $LOG_PATH
-shopt -u dotglob
-
-sudo find /usr/local/etc ! -name "php.ini" | xargs -I {} chown ${USER_NAME}:${USER_NAME} {}
-
 configure_php_ini() {
     sed -i \
         -e "s/memory_limit.*$/memory_limit = ${PHP_MEMORY_LIMIT:-128M}/g" \
@@ -50,44 +33,6 @@ configure_php_ini() {
     # } > $PHP_INI_SCAN_DIR/zz-session-strict.ini
 }
 
-install_composer_dependencies() {
-    if [ ! -d "vendor" ] && [ -f "composer.json" ]; then
-        printf "\n\033[33mComposer vendor folder was not installed. Running >_ composer install --prefer-dist --no-interaction --optimize-autoloader --ansi\033[0m\n\n"
-
-        composer install --prefer-dist --no-interaction --optimize-autoloader --ignore-platform-reqs --ansi
-
-        printf "\n\033[33mcomposer run-script post-root-package-install\033[0m\n\n"
-
-        composer run-script post-root-package-install
-
-        printf "\n\033[33mcomposer run-script post-autoload-dump\033[0m\n\n"
-
-        composer run-script post-autoload-dump
-    fi
-}
-
-# $> {view:clear} && {cache:clear} && {route:clear} && {config:clear} && {clear-compiled}
-# @see https://github.com/laravel/framework/blob/9.x/src/Illuminate/Foundation/Console/OptimizeClearCommand.php
-if [[ -d "vendor" && ${FORCE_CLEAR:-true} == true ]]; then
-    printf "\n\033[33mLaravel - artisan view:clear + route:clear + config:clear + clear-compiled\033[0m\n\n"
-
-    php artisan event:clear || true
-    php artisan view:clear
-    php artisan route:clear
-    php artisan config:clear
-    php artisan clear-compiled
-fi
-
-if [[ -d "vendor" && ${FORCE_OPTIMIZE:-true} == true ]]; then
-    printf "\n\033[33mLaravel Cache Optimization - artisan config:cache + route:cache + view:cache\033[0m\n\n"
-
-    # $> {config:cache} && {route:cache}
-    # @see https://github.com/laravel/framework/blob/9.x/src/Illuminate/Foundation/Console/OptimizeCommand.php
-    php artisan optimize || true
-    php artisan view:cache || true
-    php artisan event:cache || true
-fi
-
 if [[ ${OPCACHE_ENABLED:-true} == false ]]; then
     rm -f ${PHP_INI_SCAN_DIR}/opcache.ini >/dev/null 2>&1 || true
     rm -f ${PHP_INI_SCAN_DIR}/docker-php-ext-opcache.ini >/dev/null 2>&1 || true
@@ -96,8 +41,6 @@ fi
 if [ "$APP_ENV" = "production" ]; then
     configure_php_ini
 fi
-
-install_composer_dependencies
 
 echo
 php -v

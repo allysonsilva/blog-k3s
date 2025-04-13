@@ -2,7 +2,6 @@ ARG APP_FOLDER=.
 ARG COMPOSER_VERSION=2.7
 ARG K3S_FOLDER=./k3s
 ARG PHP_BASE_IMAGE_VERSION=8.4-zts-alpine
-ARG APP_ENTRYPOINT_FILE=docker-entrypoint.sh
 
 #####
 ## COMPOSER
@@ -353,11 +352,18 @@ RUN set -xe \
 
 VOLUME ${LOG_PATH}
 
-ARG APP_ENTRYPOINT_FILE
-
 # ENTRYPOINT
-COPY $APP_BUILD_CONTAINER_PATH/$APP_ENTRYPOINT_FILE /entrypoint.sh
-RUN sudo chmod +x /entrypoint.sh
+
+# Copiar os scripts de entrypoint para a mesma pasta
+COPY entrypoint-pre-sync.sh /entrypoint-pre-sync.sh
+COPY entrypoint-main.sh /entrypoint-main.sh
+COPY entrypoint.sh /entrypoint.sh
+
+# Tornar os scripts executáveis
+RUN sudo chmod +x /entrypoint-pre-sync.sh \
+    && sudo chmod +x /entrypoint-main.sh \
+    && sudo chmod +x /entrypoint.sh \
+    && sudo chown $USER_NAME:$USER_NAME /entrypoint-pre-sync.sh /entrypoint-main.sh /entrypoint.sh
 
 ENTRYPOINT ["/sbin/tini", "--", "/entrypoint.sh"]
 

@@ -33,6 +33,3 @@ images:
 - name: blog-image
   newName: ewr.vultrcr.com/blog/app
   newTag: cc1608e
-- name: blog-image-pre-sync
-  newName: ewr.vultrcr.com/blog/app
-  newTag: init-cc1608e
