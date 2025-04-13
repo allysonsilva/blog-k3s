@@ -355,9 +355,9 @@ VOLUME ${LOG_PATH}
 # ENTRYPOINT
 
 # Copiar os scripts de entrypoint para a mesma pasta
-COPY entrypoint-pre-sync.sh /entrypoint-pre-sync.sh
-COPY entrypoint-main.sh /entrypoint-main.sh
-COPY entrypoint.sh /entrypoint.sh
+COPY $APP_BUILD_CONTAINER_PATH/entrypoint-pre-sync.sh /entrypoint-pre-sync.sh
+COPY $APP_BUILD_CONTAINER_PATH/entrypoint-main.sh /entrypoint-main.sh
+COPY $APP_BUILD_CONTAINER_PATH/entrypoint.sh /entrypoint.sh
 
 # Tornar os scripts executáveis
 RUN sudo chmod +x /entrypoint-pre-sync.sh \
