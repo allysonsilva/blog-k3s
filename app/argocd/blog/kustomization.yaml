@@ -32,4 +32,4 @@ resources:
 images:
 - name: blog-image
   newName: ewr.vultrcr.com/blog/app
-  newTag: cc1608e
+  newTag: e92d9c7
