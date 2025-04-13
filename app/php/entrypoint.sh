@@ -6,8 +6,8 @@
 # Verifica a variável de ambiente para saber qual script executar
 if [ "$IS_PRE_SYNC" = "true" ]; then
   echo "Executando o entrypoint do PreSync..."
-  /entrypoint-pre-sync.sh
+  /entrypoint-pre-sync.sh "$@"
 else
   echo "Executando o entrypoint principal..."
-  /entrypoint-main.sh
+  /entrypoint-main.sh "$@"
 fi
