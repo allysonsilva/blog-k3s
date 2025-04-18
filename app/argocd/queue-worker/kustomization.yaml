@@ -19,14 +19,14 @@ generatorOptions:
 
 namespace: default
 
-resources:
-- ../base
 # - rbac-rollout.yaml
 # - sync-worker-rollout.yaml
+resources:
+- ../base
 - rollout.yaml
 
 # kustomize edit set image queue-worker-image=newName:newTag
 images:
 - name: queue-worker-image
   newName: ewr.vultrcr.com/blog/app
-  newTag: cd323fb
+  newTag: b788aee
