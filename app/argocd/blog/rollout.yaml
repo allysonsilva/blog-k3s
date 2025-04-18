@@ -23,6 +23,9 @@ spec:
         args:
           - name: preview-url
             value: https://preview.alysonsilva.dev
+      postPromotionAnalysis:
+        templates:
+          - templateName: sync-worker-rollout
   replicas: 5
   revisionHistoryLimit: 2
   minReadySeconds: 30

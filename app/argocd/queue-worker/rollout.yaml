@@ -1,3 +1,24 @@
+# service dummy, usado apenas pra atender o requisito do Argo Rollouts.
+# Ele não será realmente usado para tráfego.
+#
+# Serviço necessário por conta da obrigatoriedade de `activeService`!
+#
+# Esse Service não será exposto nem usado pra tráfego real — ele serve apenas para o Argo Rollouts
+# conseguir manter seu estado de "ativo vs preview" consistente.
+apiVersion: v1
+kind: Service
+metadata:
+  name: queue-worker-service
+  annotations:
+    argocd.argoproj.io/sync-wave: "0"
+spec:
+  selector:
+    app: worker
+  ports:
+    - name: dummy
+      port: 80
+      targetPort: 80
+---
 # @see https://fidelissauro.dev/argo-rollouts-qual-a-forma-mais-simples-de-executar-canary-releases-e-blue-green-deployments-no/
 # kubectl argo rollouts get rollout queue-worker-rollout
 # kubectl argo rollouts promote queue-worker-rollout
@@ -7,10 +28,13 @@ metadata:
   name: queue-worker-rollout
   labels:
     app: queue-worker
+  annotations:
+    argocd.argoproj.io/sync-wave: "1"
 spec:
   replicas: 3
   strategy:
     blueGreen:
+      activeService: queue-worker-service
       previewReplicaCount: 1
       scaleDownDelayRevisionLimit: 1
       autoPromotionEnabled: false
@@ -37,6 +61,10 @@ spec:
           env:
             - name: CONTAINER_ROLE
               value: "QUEUE"
+            - name: PHP_MEMORY_LIMIT
+              value: "128M"
+            - name: PHP_MAX_EXECUTION_TIME
+              value: "30"
           envFrom:
             - secretRef:
                 name: app-environment-configs
