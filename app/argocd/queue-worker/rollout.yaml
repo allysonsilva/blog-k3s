@@ -31,7 +31,7 @@ metadata:
   annotations:
     argocd.argoproj.io/sync-wave: "1"
 spec:
-  replicas: 3
+  replicas: 2
   strategy:
     blueGreen:
       activeService: queue-worker-service

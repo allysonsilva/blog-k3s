@@ -19,10 +19,10 @@ generatorOptions:
 
 namespace: default
 
-# - rbac-rollout.yaml
-# - sync-worker-rollout.yaml
 resources:
 - ../base
+- rbac-rollout.yaml
+- sync-worker-rollout.yaml
 - rollout.yaml
 
 # kustomize edit set image queue-worker-image=newName:newTag
