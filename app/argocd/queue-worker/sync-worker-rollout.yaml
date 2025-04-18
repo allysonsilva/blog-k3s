@@ -14,16 +14,18 @@ spec:
             serviceAccountName: sa-queue-worker-rollout
             restartPolicy: Never
             backoffLimit: 1
-            containers:
-              - name: trigger-sync
-                image: curlimages/curl
-                command:
-                  - /bin/sh
-                  - -c
-                  - |
-                    TOKEN=$(cat /var/run/secrets/kubernetes.io/serviceaccount/token)
-                    curl -X POST \
-                      -H "Authorization: Bearer $TOKEN" \
-                      -H "Content-Type: application/json" \
-                      -d '{"syncPolicy": "automatic"}' \
-                      http://argocd-server.argocd.svc.cluster.local/api/v1/applications/queue-worker-rollout -o /dev/null -w "%{http_code}" -s
+            template:
+              spec:
+                containers:
+                  - name: trigger-sync
+                    image: curlimages/curl
+                    command:
+                      - /bin/sh
+                      - -c
+                      - |
+                        TOKEN=$(cat /var/run/secrets/kubernetes.io/serviceaccount/token)
+                        curl -X POST \
+                          -H "Authorization: Bearer $TOKEN" \
+                          -H "Content-Type: application/json" \
+                          -d '{"syncPolicy": "automatic"}' \
+                          http://argocd-server.argocd.svc.cluster.local/api/v1/applications/queue-worker-rollout -o /dev/null -w "%{http_code}" -s
