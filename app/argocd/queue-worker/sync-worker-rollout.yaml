@@ -11,11 +11,11 @@ spec:
       provider:
         job:
           spec:
-            serviceAccountName: sa-queue-worker-rollout
-            restartPolicy: Never
             backoffLimit: 1
             template:
               spec:
+                serviceAccountName: sa-queue-worker-rollout
+                restartPolicy: Never
                 containers:
                   - name: trigger-sync
                     image: curlimages/curl
