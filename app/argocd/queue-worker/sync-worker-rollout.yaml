@@ -15,7 +15,6 @@ spec:
             template:
               spec:
                 serviceAccountName: sa-queue-worker-rollout
-                restartPolicy: Never
                 containers:
                   - name: trigger-sync
                     image: curlimages/curl
