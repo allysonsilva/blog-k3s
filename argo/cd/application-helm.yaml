@@ -60,6 +60,8 @@ spec:
           params:
             server.insecure: true
           cm:
+            accounts.admin: apiKey
+            accounts.admin.enabled: "true"
             kustomize.buildOptions: "--load-restrictor LoadRestrictionsNone"
           cmp:
             create: true
