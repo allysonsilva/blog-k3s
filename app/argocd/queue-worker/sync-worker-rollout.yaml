@@ -14,7 +14,7 @@ spec:
             backoffLimit: 1
             template:
               spec:
-                restartPolicy: Never
+                restartPolicy: "Never"
                 serviceAccountName: sa-queue-worker-rollout
                 containers:
                   - name: trigger-sync
