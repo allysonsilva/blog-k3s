@@ -63,6 +63,12 @@ spec:
             accounts.management: apiKey, login
             accounts.management.enabled: "true"
             kustomize.buildOptions: "--load-restrictor LoadRestrictionsNone"
+          # argocd account list
+          # argocd account get --account management
+          # argocd account update-password --account management --current-password <senha-usuario-atualmente-logado> --new-password <new-user-password>
+          # argocd account generate-token --account management
+          # argocd logout argocd-server.argocd.svc.cluster.local
+          # argocd --server argocd-server.argocd.svc.cluster.local --plaintext --auth-token <mytoken> app list
           rbac:
             policy.default: role:readonly
             # policy.default: role:admin
