@@ -62,7 +62,15 @@ spec:
           cm:
             accounts.admin: apiKey
             accounts.admin.enabled: "true"
+            accounts.management: apiKey
+            accounts.management.enabled: "true"
             kustomize.buildOptions: "--load-restrictor LoadRestrictionsNone"
+          rbac:
+            policy.default: role:readonly
+            policy.csv: |
+              g, admin, role:admin
+              g, management, role:admin
+              p, role:admin, *, *, *, allow
           cmp:
             create: true
             plugins:
