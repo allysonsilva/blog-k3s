@@ -1,0 +1,16 @@
+---
+# k create secret generic argocd-api-token --namespace default --from-env-file=.env.argocd --dry-run=client --output yaml | kubeseal > argocd-api-token.yaml --format yaml
+apiVersion: bitnami.com/v1alpha1
+kind: SealedSecret
+metadata:
+  creationTimestamp: null
+  name: argocd-api-token
+  namespace: default
+spec:
+  encryptedData:
+    ARGOCD_TOKEN: AgA86y/9J4wuhMLGM+TamGxb8iTorWTCRjRygNll7RkTUTmce2X4r3OIoN6CmZcvcgNztbN9wv5wmSSYg5hqQ+e9z98yDUWicEnoONcTH/VXnqRj1RUFI+OBeyeX1c2ZOci+5kROgcTbAW7M+He1wOMveRbwM6CMQkAQkv1+raTDAYRHzu9YdcFvw/1sgDr4iNvlnoBc5qBc3u0mXiVtg+s93TH7/bAp2gOEGz2LU1AwgEPihTV1aRgwKYM/S6se993aq2w4LuBGzJUZ6+zwogWb1IgW+wkiwwHsJEsQXrJTCl8v3t13r895+NbmvEQ/FAEXGuoSKfVg5DNZGJ1wZuTA2AulPTjcCSyYtoR1VdkbxAfcnycES5E7DA2WIasoHPng8nu6FKhHjgai1u3lxdcv01dcqRGd6fyRxTzV6AfH+3XdNHOAoqtz+BsF+00Z5bdhzijpH/sLNwadAAz0hlOQ8JLnO3mNpLNjGqPA6cTOpFKh0xftBzbnMhtvUoAljbmMdV1u+fua123RSQaeKQpwBW+PgaxnfLXfX0B7jelHBn2GMv8nrdmFRC6JT1kn4/VSGy+VWHVK16JKvrCt4D8sRt7GTmZQjymwUx385L2uEWPNPc58hkPJIMWap+7PhEMfh1XkSF75m0w/hN1xvzcuN5/w0lSFfmTWxGxj6keY61SIcb2qwkEFnZvqVR/RmJnut12LcCeGjT4T+cizxHMInqCV7RG+ikXHOVblaIx1eVtTENHYfbwkSr6QrGwJRVBas3+nmFElQyv6IucLgfG0lOAL9OVkDmBCW6mfNSrMKfX/wXKHyXobaK9Rmf6ZKF+xSAmmi20iDSzBEfjcMC1Ux3BqKAK0OjbX1iDhd7WDODooM728TZhtkNX5/DwH4tFtaDCUV8kZxQkCk32qg13nB5xy3rF9QqhYfkY1W1mYwHIitFmbU4hf5gH+pSU/YcDSTb9NGYfL6HsPA/XmuEjpLsvQDxjTzElfktg0yotvnJjW6AOp2mpQu6MMSg==
+  template:
+    metadata:
+      creationTimestamp: null
+      name: argocd-api-token
+      namespace: default

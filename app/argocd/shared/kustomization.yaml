@@ -17,4 +17,5 @@ namespace: default
 # ./scripts/env-to-file.sh --env=app/argocd/shared/.env --file=app/argocd/shared/config.example.yaml | kubeseal > app/argocd/shared/credentials.yaml --format yaml
 resources:
 - credentials.yaml
+- argocd-api-token.yaml
 - app-blog-pvc.yaml
