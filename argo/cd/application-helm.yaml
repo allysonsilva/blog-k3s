@@ -60,15 +60,23 @@ spec:
           params:
             server.insecure: true
           cm:
-            accounts.admin: apiKey
-            accounts.admin.enabled: "true"
-            accounts.management: apiKey
+            accounts.management: apiKey, login
             accounts.management.enabled: "true"
             kustomize.buildOptions: "--load-restrictor LoadRestrictionsNone"
           rbac:
+            policy.default: role:readonly
+            # policy.default: role:admin
             policy.csv: |
-              g, admin, role:admin
-              p, role:admin, *, *, *, allow
+              p, role:argocd-server, projects, *, */, allow
+              p, role:argocd-server, applications, *, */*, allow
+              p, role:argocd-server, clusters, get, *, allow
+              p, role:argocd-server, repositories, get, *, allow
+              p, role:argocd-server, repositories, create, *, allow
+              p, role:argocd-server, repositories, update, *, allow
+              p, role:argocd-server, repositories, delete, *, allow
+              p, role:argocd-server, logs, get, *, allow
+              p, role:argocd-server, exec, create, */*, allow
+              g, management, role:argocd-server
           cmp:
             create: true
             plugins:
