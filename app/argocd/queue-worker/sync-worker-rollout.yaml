@@ -11,21 +11,53 @@ spec:
       provider:
         job:
           spec:
-            backoffLimit: 1
+            backoffLimit: 2
             template:
               spec:
                 restartPolicy: "Never"
-                serviceAccountName: sa-queue-worker-rollout
+                volumes:
+                  - name: argocd-token
+                    secret:
+                      secretName: argocd-api-token
                 containers:
                   - name: trigger-sync
                     image: curlimages/curl
+                    volumeMounts:
+                      - name: argocd-token
+                        mountPath: "/mnt/secrets"
+                        readOnly: true
                     command:
                       - /bin/sh
                       - -c
                       - |
-                        TOKEN=$(cat /var/run/secrets/kubernetes.io/serviceaccount/token)
+                        # ADMIN_PASSWORD=$(cat /mnt/secrets/ARGOCD_ADMIN_PASSWORD)
+                        # ARGOCD_TOKEN=$(curl -ss -k -X POST -H "Content-Type: application/json" http://argocd-server.argocd.svc.cluster.local/api/v1/session -d "{\"username\":\"admin\",\"password\":\"$ADMIN_PASSWORD\"}"|sed "s/.*token.*\"\(.*\)\".*/\1/")
+                        # syncstatus=$(curl -ss -k -H "Content-Type: application/json"  http://argocd-server.argocd.svc.cluster.local/api/v1/applications/app-1  -H "Authorization: Bearer $ARGOCD_TOKEN"| sed -n 's/.*"sync":{"status":"\([^"]*\)".*/\1/p')
+                        # echo "syncstatus: $syncstatus"
+                        # if [ "$syncstatus" == "Synced" ]; then
+                        #   echo "Application is synced. Exiting..."
+                        #   exit 0
+                        # fi
+
+                        TOKEN=$(cat /mnt/secrets/ARGOCD_TOKEN)
+                        echo
+                        echo "➡️  Disparando sync para aplicação queue-worker 🛠️"
+
                         curl -X POST \
                           -H "Authorization: Bearer $TOKEN" \
                           -H "Content-Type: application/json" \
-                          -d '{"syncPolicy": "automatic"}' \
-                          http://argocd-server.argocd.svc.cluster.local/api/v1/applications/queue-worker-rollout -o /dev/null -w "%{http_code}" -s
+                          http://argocd-server.argocd.svc.cluster.local/api/v1/applications/queue-worker/sync -o /dev/null -w "%{http_code}" -s
+
+                        echo
+                        echo "⏰ Wait for health"
+
+                        sleep 90
+                        status=""
+                        while [ "$status" != "Healthy" ]; do
+                          sleep 5
+                          echo "⏳ Waiting for queue-worker to be healthy"
+                          status=$(curl -ss -k -H "Content-Type: application/json"  http://argocd-server.argocd.svc.cluster.local/api/v1/applications/queue-worker  -H "Authorization: Bearer $ARGOCD_TOKEN" | sed -n 's/.*"health":{"status":"\([^"]*\)".*/\1/p')
+                        done
+
+                        echo
+                        echo "🚀 queue-worker is healthy"
