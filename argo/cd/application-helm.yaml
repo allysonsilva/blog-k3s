@@ -60,21 +60,19 @@ spec:
           params:
             server.insecure: true
           cm:
-            accounts.management: apiKey,login
-            accounts.management.enabled: "true"
+            accounts.infra: apiKey,login
+            accounts.infra.enabled: "true"
             kustomize.buildOptions: "--load-restrictor LoadRestrictionsNone"
           # argocd account list
-          # argocd account get --account management
-          # argocd account update-password --account management --current-password <senha-usuario-atualmente-logado> --new-password <new-user-password>
-          # argocd account generate-token --account management
+          # argocd account get --account infra
+          # argocd account update-password --account infra --current-password <senha-usuario-atualmente-logado> --new-password <new-user-password>
+          # argocd account generate-token --account infra
           # argocd logout argocd-server.argocd.svc.cluster.local
           # argocd --server argocd-server.argocd.svc.cluster.local --plaintext --auth-token <mytoken> app list
           rbac:
-            # policy.default: role:readonly
-            policy.default: role:admin
-            # "O grupo management recebe a role argocd-server"
+            policy.default: role:readonly
             policy.csv: |
-              g, management, role:admin
+              g, infra, role:admin
           cmp:
             create: true
             plugins:
