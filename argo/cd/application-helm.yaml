@@ -60,7 +60,7 @@ spec:
           params:
             server.insecure: true
           cm:
-            accounts.management: apiKey, login
+            accounts.management: apiKey,login
             accounts.management.enabled: "true"
             kustomize.buildOptions: "--load-restrictor LoadRestrictionsNone"
           # argocd account list
@@ -70,19 +70,20 @@ spec:
           # argocd logout argocd-server.argocd.svc.cluster.local
           # argocd --server argocd-server.argocd.svc.cluster.local --plaintext --auth-token <mytoken> app list
           rbac:
-            policy.default: role:readonly
-            # policy.default: role:admin
+            # policy.default: role:readonly
+            policy.default: role:admin
+            # "O grupo management recebe a role argocd-server"
             policy.csv: |
-              p, role:argocd-server, projects, *, */, allow
-              p, role:argocd-server, applications, *, */*, allow
-              p, role:argocd-server, clusters, get, *, allow
-              p, role:argocd-server, repositories, get, *, allow
-              p, role:argocd-server, repositories, create, *, allow
-              p, role:argocd-server, repositories, update, *, allow
-              p, role:argocd-server, repositories, delete, *, allow
-              p, role:argocd-server, logs, get, *, allow
-              p, role:argocd-server, exec, create, */*, allow
-              g, management, role:argocd-server
+              p, role:management, projects, *, */, allow
+              p, role:management, applications, *, */*, allow
+              p, role:management, clusters, get, *, allow
+              p, role:management, repositories, get, *, allow
+              p, role:management, repositories, create, *, allow
+              p, role:management, repositories, update, *, allow
+              p, role:management, repositories, delete, *, allow
+              p, role:management, logs, get, *, allow
+              p, role:management, exec, create, */*, allow
+              g, user:management, role:management
           cmp:
             create: true
             plugins:
