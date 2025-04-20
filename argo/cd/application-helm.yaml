@@ -74,16 +74,7 @@ spec:
             policy.default: role:admin
             # "O grupo management recebe a role argocd-server"
             policy.csv: |
-              p, role:management, projects, *, */, allow
-              p, role:management, applications, *, */*, allow
-              p, role:management, clusters, get, *, allow
-              p, role:management, repositories, get, *, allow
-              p, role:management, repositories, create, *, allow
-              p, role:management, repositories, update, *, allow
-              p, role:management, repositories, delete, *, allow
-              p, role:management, logs, get, *, allow
-              p, role:management, exec, create, */*, allow
-              g, user:management, role:management
+              g, management, role:admin
           cmp:
             create: true
             plugins:
