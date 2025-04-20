@@ -72,7 +72,16 @@ spec:
           rbac:
             policy.default: role:readonly
             policy.csv: |
-              g, infra, role:admin
+              p, role:management, projects, *, */, allow
+              p, role:management, applications, *, */*, allow
+              p, role:management, clusters, get, *, allow
+              p, role:management, repositories, get, *, allow
+              p, role:management, repositories, create, *, allow
+              p, role:management, repositories, update, *, allow
+              p, role:management, repositories, delete, *, allow
+              p, role:management, logs, get, *, allow
+              p, role:management, exec, create, */*, allow
+              g, infra, role:management
           cmp:
             create: true
             plugins:
