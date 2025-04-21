@@ -7,7 +7,8 @@ metadata:
 spec:
   metrics:
     - name: sync-worker
-      successCondition: result.exitCode == 0
+      # successCondition: result.exitCode == 0
+      successCondition: result.stdout.contains("App queue-worker is Synced and Healthy")
       provider:
         job:
           spec:
@@ -30,32 +31,69 @@ spec:
                       - /bin/sh
                       - -c
                       - |
+                        echo
+                        echo "🔑 Lendo token..."
+
                         ARGOCD_TOKEN=$(cat /mnt/secrets/ARGOCD_TOKEN)
 
-                        echo "➡️ Disparando sync para aplicação queue-worker 🛠️"
+                        echo
+                        echo "🚚 Disparando sync para aplicação queue-worker 🛠️"
+                        echo
 
-                        curl -X POST \
+                        curl -s -X POST \
                           -H "Authorization: Bearer $ARGOCD_TOKEN" \
                           -H "Content-Type: application/json" \
                           http://argocd-server.argocd.svc.cluster.local/api/v1/applications/queue-worker/sync \
-                          -o /dev/null -w "%{http_code}" -s
+                          -o /dev/null -w "🚦 Status code: %{http_code}\n"
 
-                        echo "⏰ Aguardando aplicação ficar Healthy..."
+                        echo
+                        echo "⏰ Aguardando aplicação estar Synced e Healthy..."
 
                         sleep 30
-                        status=""
 
-                        while [ "$status" != "Healthy" ]; do
-                          sleep 10
-                          # echo "⏳ Waiting for queue-worker to be healthy"
+                        # status=""
+                        # timeout=$((SECONDS + 300)); # 5 minutos
+                        # while [ "$status" != "Healthy" ]; do
+                        #   if [ $SECONDS -ge $timeout ]; then
+                        #     echo
+                        #     echo "❌ Timeout: aplicação não ficou Healthy após 5 minutos"
+                        #     exit 1
+                        #   fi
 
-                          status=$(curl -s -k \
-                            -H "Content-Type: application/json" \
+                        #   sleep 10
+                        #   # echo "⏳ Waiting for queue-worker to be healthy"
+
+                        #   status=$(curl -s -k \
+                        #     -H "Content-Type: application/json" \
+                        #     -H "Authorization: Bearer $ARGOCD_TOKEN" \
+                        #     http://argocd-server.argocd.svc.cluster.local/api/v1/applications/queue-worker | \
+                        #     jq -r '.status.sync.status')
+
+                        #   echo
+                        #   echo "⏳ Sync Status atual: $status"
+                        # done
+
+                        for i in {1..30}; do
+                          RESPONSE=$(curl -s \
                             -H "Authorization: Bearer $ARGOCD_TOKEN" \
-                            http://argocd-server.argocd.svc.cluster.local/api/v1/applications/queue-worker | \
-                            jq -r '.status.health.status')
+                            -H "Content-Type: application/json" \
+                            http://argocd-server.argocd.svc.cluster.local/api/v1/applications/queue-worker)
 
-                          echo "⏳ Status atual: $status"
+                          SYNC_STATUS=$(echo "$RESPONSE" | jq -r '.status.sync.status')
+                          HEALTH_STATUS=$(echo "$RESPONSE" | jq -r '.status.health.status')
+
+                          echo
+                          echo "🔄 Sync: $SYNC_STATUS | ❤️ Health: $HEALTH_STATUS"
+
+                          if [ "$SYNC_STATUS" = "Synced" ] && [ "$HEALTH_STATUS" = "Healthy" ]; then
+                            echo
+                            echo "🚀 ✅  App queue-worker is Synced and Healthy!"
+                            exit 0
+                          fi
+
+                          sleep 10
                         done
 
-                        echo "🚀 Aplicação queue-worker está Healthy!"
+                        echo
+                        echo "❌ Timeout esperando aplicação sincronizar e ficar saudável"
+                        exit 1
