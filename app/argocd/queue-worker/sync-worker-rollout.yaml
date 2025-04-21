@@ -73,7 +73,7 @@ spec:
                         #   echo "⏳ Sync Status atual: $status"
                         # done
 
-                        for i in {1..30}; do
+                        for i in $(seq 1 30); do
                           RESPONSE=$(curl -s \
                             -H "Authorization: Bearer $ARGOCD_TOKEN" \
                             -H "Content-Type: application/json" \
@@ -83,6 +83,7 @@ spec:
                           HEALTH_STATUS=$(echo "$RESPONSE" | jq -r '.status.health.status')
 
                           echo
+                          echo "⏳ Tentativa $i"
                           echo "🔄 Sync: $SYNC_STATUS | ❤️ Health: $HEALTH_STATUS"
 
                           if [ "$SYNC_STATUS" = "Synced" ] && [ "$HEALTH_STATUS" = "Healthy" ]; then
