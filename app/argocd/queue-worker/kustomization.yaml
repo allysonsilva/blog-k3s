@@ -21,6 +21,7 @@ namespace: default
 
 resources:
 - sync-worker-rollout.yaml
+- queue-worker-post-promotion.yaml
 - rollout.yaml
 
 # kustomize edit set image queue-worker-image=newName:newTag

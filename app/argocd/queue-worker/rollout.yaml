@@ -37,7 +37,10 @@ spec:
       activeService: queue-worker-service
       previewReplicaCount: 1
       scaleDownDelayRevisionLimit: 1
-      autoPromotionEnabled: false
+      autoPromotionEnabled: true
+      postPromotionAnalysis:
+        templates:
+          - templateName: queue-worker-post-promotion
   revisionHistoryLimit: 2
   minReadySeconds: 30
   selector:

@@ -1,7 +1,7 @@
 apiVersion: argoproj.io/v1alpha1
 kind: AnalysisTemplate
 metadata:
-  name: preview-health-check
+  name: blog-preview-health-check
 spec:
   args:
     - name: preview-url

@@ -19,7 +19,7 @@ spec:
       # manifests foram aplicados com sucesso, mas antes de fazer a promoção pra produção.
       prePromotionAnalysis:
         templates:
-          - templateName: preview-health-check
+          - templateName: blog-preview-health-check
         args:
           - name: preview-url
             value: https://preview.alysonsilva.dev

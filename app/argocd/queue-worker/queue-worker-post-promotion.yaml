@@ -1,0 +1,26 @@
+apiVersion: argoproj.io/v1alpha1
+kind: AnalysisTemplate
+metadata:
+  name: queue-worker-post-promotion
+spec:
+  metrics:
+    - name: queue-worker-health-check
+      successCondition: result.exitCode == 0
+      provider:
+        job:
+          spec:
+            backoffLimit: 0
+            template:
+              spec:
+                restartPolicy: "Never"
+                containers:
+                  - name: queue-worker
+                    image: queue-worker-image
+                    # command: ["/bin/sh", "-c"]
+                    args:
+                      - |
+                        echo
+                        echo "⚡️ Executando php artisan queue:work ..."
+
+                        php artisan queue:work redis --once --queue=queue_default --tries=1 --timeout=10
+                        exit 0
