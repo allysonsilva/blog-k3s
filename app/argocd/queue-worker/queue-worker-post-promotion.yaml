@@ -16,6 +16,9 @@ spec:
                 containers:
                   - name: queue-worker
                     image: queue-worker-image
+                    env:
+                      - name: CONTAINER_ROLE
+                        value: "QUEUE"
                     resources:
                       requests:
                         cpu: 100m
@@ -23,8 +26,9 @@ spec:
                       limits:
                         cpu: 200m
                         memory: 256Mi
-                    # command: ["/bin/sh", "-c"]
                     args:
+                      - /bin/bash
+                      - -c
                       - |
                         echo
                         echo "🔍 ⚡️ Health check do queue-worker iniciado"
@@ -33,8 +37,10 @@ spec:
                         EXIT_CODE=$?
 
                         if [ $EXIT_CODE -ne 0 ]; then
+                          echo
                           echo "❌ php artisan queue:work falhou com código $EXIT_CODE"
                         else
+                          echo
                           echo "✅ php artisan queue:work executado com sucesso!"
                         fi
 
