@@ -97,4 +97,6 @@ elif [ "$CONTAINER_ROLE" = "SCHEDULER" ]; then
     exec php artisan schedule:work
 fi
 
+# Se argumentos forem passados, executa eles diretamente
+echo "🧪 Executando comando customizado: $@"
 exec "$@"

@@ -9,7 +9,7 @@ spec:
       provider:
         job:
           spec:
-            backoffLimit: 0
+            backoffLimit: 1
             template:
               spec:
                 restartPolicy: "Never"
@@ -18,7 +18,7 @@ spec:
                     image: queue-worker-image
                     env:
                       - name: CONTAINER_ROLE
-                        value: "QUEUE"
+                        value: "CUSTOM"
                     resources:
                       requests:
                         cpu: 100m

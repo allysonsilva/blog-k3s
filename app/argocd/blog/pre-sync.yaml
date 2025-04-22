@@ -31,7 +31,7 @@ spec:
           cpu: "1"
           memory: "512Mi"
       args:
-        - /bin/sh
+        - /bin/bash
         - -c
         - |
           # if [ -f /app-data/.copied ]; then
