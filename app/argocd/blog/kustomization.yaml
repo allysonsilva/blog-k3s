@@ -31,4 +31,4 @@ resources:
 images:
 - name: blog-image
   newName: ewr.vultrcr.com/blog/app
-  newTag: "0020377"
+  newTag: 0fcc7a8
