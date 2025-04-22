@@ -12,7 +12,7 @@ spec:
       provider:
         job:
           spec:
-            backoffLimit: 2
+            backoffLimit: 0
             template:
               spec:
                 restartPolicy: "Never"
@@ -73,7 +73,8 @@ spec:
                         #   echo "⏳ Sync Status atual: $status"
                         # done
 
-                        for i in $(seq 1 30); do
+                        # 3 minutos de timeout pq 18 da sequencia * 10 (sleep) = 180 segundos
+                        for i in $(seq 1 18); do
                           RESPONSE=$(curl -s \
                             -H "Authorization: Bearer $ARGOCD_TOKEN" \
                             -H "Content-Type: application/json" \
