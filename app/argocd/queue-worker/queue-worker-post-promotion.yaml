@@ -9,6 +9,11 @@ spec:
       provider:
         job:
           spec:
+            # O Kubernetes vai permitir uma única tentativa de reexecução do Pod se ele falhar.
+            # Ou seja, o Pod pode executar no máximo 2 vezes no total:
+            # 1ª execução: se falhar...
+            # 2ª tentativa (retry): última chance.
+            # Depois disso, o Job é marcado como Failed.
             backoffLimit: 1
             template:
               spec:

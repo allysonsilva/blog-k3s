@@ -12,6 +12,9 @@ spec:
       provider:
         job:
           spec:
+            # O Job não vai fazer nenhuma nova tentativa caso o pod falhe.
+            # Ou seja, se o pod falhar uma vez, o Job termina imediatamente como "Failed".
+            # backoffLimit controla quantas vezes o Kubernetes vai tentar reexecutar o Pod em caso de falha (exit code != 0).
             backoffLimit: 0
             template:
               spec:
