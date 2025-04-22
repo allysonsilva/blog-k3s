@@ -33,7 +33,7 @@ spec:
                         echo
                         echo "🔍 ⚡️ Health check do queue-worker iniciado"
 
-                        php artisan queue:work redis --once --queue=queue_default --tries=1 --timeout=10
+                        php artisan queue:work redis2 --once --queue=queue_default --tries=1 --timeout=10
                         EXIT_CODE=$?
 
                         if [ $EXIT_CODE -ne 0 ]; then

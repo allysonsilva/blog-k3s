@@ -98,5 +98,5 @@ elif [ "$CONTAINER_ROLE" = "SCHEDULER" ]; then
 fi
 
 # Se argumentos forem passados, executa eles diretamente
-echo "🧪 Executando comando customizado: $@"
+# echo "🧪 Executando comando customizado: $@"
 exec "$@"
