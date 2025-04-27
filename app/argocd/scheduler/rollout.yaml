@@ -1,0 +1,73 @@
+# service dummy, usado apenas pra atender o requisito do Argo Rollouts.
+# Ele não será realmente usado para tráfego.
+#
+# Serviço necessário por conta da obrigatoriedade de `activeService`!
+#
+# Esse Service não será exposto nem usado pra tráfego real — ele serve apenas para o Argo Rollouts
+# conseguir manter seu estado de "ativo vs preview" consistente.
+apiVersion: v1
+kind: Service
+metadata:
+  name: scheduler-service
+  annotations:
+    argocd.argoproj.io/sync-wave: "0"
+spec:
+  selector:
+    app: scheduler
+  ports:
+    - name: dummy
+      port: 80
+      targetPort: 80
+---
+# @see https://fidelissauro.dev/argo-rollouts-qual-a-forma-mais-simples-de-executar-canary-releases-e-blue-green-deployments-no/
+# kubectl argo rollouts get rollout scheduler-rollout
+# kubectl argo rollouts promote scheduler-rollout
+apiVersion: argoproj.io/v1alpha1
+kind: Rollout
+metadata:
+  name: scheduler-rollout
+  labels:
+    app: scheduler
+  annotations:
+    argocd.argoproj.io/sync-wave: "1"
+spec:
+  replicas: 2
+  strategy:
+    blueGreen:
+      activeService: scheduler-service
+      previewReplicaCount: 1
+      scaleDownDelayRevisionLimit: 1
+      autoPromotionEnabled: true
+  revisionHistoryLimit: 2
+  minReadySeconds: 30
+  selector:
+    matchLabels:
+      app: scheduler
+  template:
+    metadata:
+      labels:
+        app: scheduler
+    spec:
+      imagePullSecrets:
+        - name: vultr-cr-credentials
+      volumes:
+        - name: app-blog-shared
+          persistentVolumeClaim:
+            claimName: app-blog-pvc
+      containers:
+        - name: app-scheduler
+          image: scheduler-image
+          imagePullPolicy: IfNotPresent
+          env:
+            - name: CONTAINER_ROLE
+              value: "SCHEDULER"
+            - name: PHP_MEMORY_LIMIT
+              value: "128M"
+            - name: PHP_MAX_EXECUTION_TIME
+              value: "30"
+          envFrom:
+            - secretRef:
+                name: app-environment-configs
+          volumeMounts:
+            - name: app-blog-shared
+              mountPath: /var/www/app

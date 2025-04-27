@@ -1,9 +1,7 @@
 apiVersion: argoproj.io/v1alpha1
 kind: AnalysisTemplate
 metadata:
-  name: sync-worker-rollout
-  annotations:
-    argocd.argoproj.io/sync-wave: "3"
+  name: sync-worker-scheduler-rollout
 spec:
   metrics:
     - name: sync-worker
@@ -101,4 +99,86 @@ spec:
 
                         echo
                         echo "❌ Timeout esperando aplicação sincronizar e ficar saudável"
+                        exit 1
+    - name: sync-scheduler
+      successCondition: result.stdout.contains("Aplicativo sincronizado com sucesso")
+      provider:
+        job:
+          spec:
+            # O Job não vai fazer nenhuma nova tentativa caso o pod falhe.
+            # Ou seja, se o pod falhar uma vez, o Job termina imediatamente como "Failed".
+            # backoffLimit controla quantas vezes o Kubernetes vai tentar reexecutar o Pod em caso de falha (exit code != 0).
+            backoffLimit: 0
+            template:
+              spec:
+                restartPolicy: "Never"
+                volumes:
+                  - name: argocd-token
+                    secret:
+                      secretName: argocd-api-token
+                containers:
+                  - name: trigger-sync
+                    image: dwdraju/alpine-curl-jq
+                    volumeMounts:
+                      - name: argocd-token
+                        mountPath: "/mnt/secrets"
+                        readOnly: true
+                    command:
+                      - /bin/sh
+                      - -c
+                      - |
+                        echo
+                        echo "🔑 Lendo token..."
+
+                        ARGOCD_TOKEN=$(cat /mnt/secrets/ARGOCD_TOKEN)
+
+                        echo
+                        echo "🚚 Disparando sync para aplicação scheduler ⚡️"
+                        echo
+
+                        APP_NAME="scheduler"
+                        ARGOCD_SERVER="http://argocd-server.argocd.svc.cluster.local"
+                        SYNC_TIMEOUT=120 # segundos
+                        POLL_INTERVAL=5 # segundos
+
+                        curl -s -X POST \
+                          -H "Authorization: Bearer $ARGOCD_TOKEN" \
+                          -H "Content-Type: application/json" \
+                          "$ARGOCD_SERVER/api/v1/applications/$APP_NAME/sync"
+
+                        echo
+                        echo "⏰ Aguardando aplicação estar Synced e Healthy..."
+
+                        START_TIME=$(date +%s)
+
+                        while true; do
+                          RESPONSE=$(curl -s -X GET \
+                            -H "Authorization: Bearer $ARGOCD_TOKEN" \
+                            -H "Content-Type: application/json" \
+                            "$ARGOCD_SERVER/api/v1/applications/$APP_NAME")
+
+                          SYNC_STATUS=$(echo "$RESPONSE" | jq -r '.status.sync.status')
+                          HEALTH_STATUS=$(echo "$RESPONSE" | jq -r '.status.health.status')
+
+                          echo
+                          echo "Status atual: 🔄 Sync=$SYNC_STATUS | ❤️ Health=$HEALTH_STATUS"
+
+                          if [[ "$SYNC_STATUS" == "Synced" && "$HEALTH_STATUS" == "Healthy" ]]; then
+                            echo
+                            echo "✅ Aplicativo sincronizado com sucesso!"
+                            exit 0
+                          fi
+
+                          CURRENT_TIME=$(date +%s)
+                          ELAPSED=$((CURRENT_TIME - START_TIME))
+
+                          if [ "$ELAPSED" -gt "$SYNC_TIMEOUT" ]; then
+                            break
+                          fi
+
+                          sleep $POLL_INTERVAL
+                        done
+
+                        echo
+                        echo "❌ Timeout: Aplicativo não sincronizou em $SYNC_TIMEOUT segundos."
                         exit 1

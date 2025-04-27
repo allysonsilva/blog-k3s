@@ -22,6 +22,7 @@ namespace: default
 resources:
 - pre-sync.yaml
 - preview-health-check.yaml
+- sync-worker-scheduler-rollout.yaml
 - rollout.yaml
 - service-active.yaml
 - service-preview.yaml

@@ -6,7 +6,7 @@ kind: Kustomization
 labels:
 - includeSelectors: true
   pairs:
-    app: worker
+    app: scheduler
     env: production
     version: v1
 
@@ -20,11 +20,10 @@ generatorOptions:
 namespace: default
 
 resources:
-- queue-worker-post-promotion.yaml
 - rollout.yaml
 
-# kustomize edit set image queue-worker-image=newName:newTag
+# kustomize edit set image scheduler-image=newName:newTag
 images:
-- name: queue-worker-image
+- name: scheduler-image
   newName: ewr.vultrcr.com/blog/app
-  newTag: 913cd93
+  newTag: f6b8adf
