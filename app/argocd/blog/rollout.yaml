@@ -25,7 +25,7 @@ spec:
             value: https://preview.alysonsilva.dev
       postPromotionAnalysis:
         templates:
-          - templateName: sync-worker-rollout
+          - templateName: sync-worker-scheduler-rollout
   replicas: 5
   revisionHistoryLimit: 2
   minReadySeconds: 30
