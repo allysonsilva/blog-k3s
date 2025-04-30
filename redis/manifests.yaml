@@ -119,26 +119,26 @@ spec:
         - name: redis-conf
           mountPath: /usr/local/etc/redis/redis.conf
           subPath: redis.conf
-        # readinessProbe:
-        #   exec:
-        #     command:
-        #     - sh
-        #     - -c
-        #     - |
-        #       redis-cli --user info --no-auth-warning ping | grep PONG
-        #   initialDelaySeconds: 20
-        #   periodSeconds: 5
-        #   timeoutSeconds: 1
-        # livenessProbe:
-        #   exec:
-        #     command:
-        #     - sh
-        #     - -c
-        #     - |
-        #       redis-cli --user info --no-auth-warning ping | grep PONG
-        #   initialDelaySeconds: 20
-        #   periodSeconds: 5
-        #   timeoutSeconds: 1
+        readinessProbe:
+          exec:
+            command:
+            - sh
+            - -c
+            - |
+              redis-cli --user info --pass "" --no-auth-warning ping | grep PONG
+          initialDelaySeconds: 20
+          periodSeconds: 5
+          timeoutSeconds: 1
+        livenessProbe:
+          exec:
+            command:
+            - sh
+            - -c
+            - |
+              redis-cli -u redis://info:@localhost:6379/0 --no-auth-warning ping | grep PONG
+          initialDelaySeconds: 20
+          periodSeconds: 5
+          timeoutSeconds: 1
       volumes:
       - name: redis-persistent-storage
         persistentVolumeClaim:
