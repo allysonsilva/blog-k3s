@@ -72,18 +72,26 @@ spec:
       containers:
       - name: redis
         image: redis:7.4-alpine
-        command: ["/usr/local/bin/redis-server"]
-        args:
-          - "/usr/local/etc/redis/redis.conf"
-          - "--port"
-          - "6379"
-          - "--appendonly"
-          - "yes"
-          - "--requirepass"
-          - "$(REDIS_PASSWORD)"
+        # # O usuário `readonly` é permitido apenas nas chaves de `readonly:*`
+        # user readonly on >readonlypassword ~readonly:* +get +exists +ttl +pttl
+        command:
+          - /bin/sh
+          - -c
+          - |
+            cat <<EOF > /usr/local/etc/redis/users.acl
+            user default on >${REDIS_DEFAULT_PASS} allkeys allchannels allcommands
+            user admin on >${REDIS_ADMIN_PASSWORD} allcommands -@dangerous allkeys
+            user info on nopass allkeys +@read +info +ping
+            EOF
+            exec redis-server /usr/local/etc/redis/redis.conf --aclfile /usr/local/etc/redis/users.acl --port 6379 --appendonly yes
         env:
         # # Create a Sealed Secret
-        # k create secret generic credentials --from-literal="REDIS_PASS=<password>" --namespace=redis --dry-run=client --output yaml | kubeseal > credentials.yaml --format yaml
+        # k create secret generic credentials \
+        # --from-literal="REDIS_DEFAULT_PASS=<password>" \
+        # --from-literal="REDIS_ADMIN_PASSWORD=<password>" \
+        # --namespace=redis \
+        # --dry-run=client \
+        # --output yaml | kubeseal > credentials.yaml --format yaml
         - name: REDIS_PASSWORD
           valueFrom:
             secretKeyRef:
@@ -110,9 +118,9 @@ spec:
           exec:
             command:
             - sh
-            - "-c"
-            - |-
-              redis-cli -a "$REDIS_PASSWORD" --no-auth-warning ping | grep PONG
+            - -c
+            - |
+              redis-cli --user info --no-auth-warning ping | grep PONG
           initialDelaySeconds: 20
           periodSeconds: 5
           timeoutSeconds: 1
@@ -120,9 +128,9 @@ spec:
           exec:
             command:
             - sh
-            - "-c"
-            - |-
-              redis-cli -a "$REDIS_PASSWORD" --no-auth-warning ping | grep PONG
+            - -c
+            - |
+              redis-cli --user info --no-auth-warning ping | grep PONG
           initialDelaySeconds: 20
           periodSeconds: 5
           timeoutSeconds: 1
