@@ -79,8 +79,8 @@ spec:
           - -c
           - |
             cat <<EOF > /usr/local/etc/redis/users.acl
-            user default on >${DEFAULT_PASS} allkeys allchannels allcommands
-            user admin on >${ADMIN_PASSWORD} allcommands -@dangerous allkeys
+            user default on >$(DEFAULT_PASSWORD) allkeys allchannels allcommands
+            user admin on >$(ADMIN_PASSWORD) allcommands -@dangerous allkeys
             user info on nopass allkeys +@read +info +ping
             EOF
             exec redis-server /usr/local/etc/redis/redis.conf --aclfile /usr/local/etc/redis/users.acl --port 6379 --appendonly yes
@@ -92,7 +92,7 @@ spec:
         # --namespace=redis \
         # --dry-run=client \
         # --output yaml | kubeseal > credentials.yaml --format yaml
-        - name: DEFAULT_PASS
+        - name: DEFAULT_PASSWORD
           valueFrom:
             secretKeyRef:
               name: credentials
