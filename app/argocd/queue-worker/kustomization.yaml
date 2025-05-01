@@ -27,4 +27,4 @@ resources:
 images:
 - name: queue-worker-image
   newName: ewr.vultrcr.com/blog/app
-  newTag: 233d13b
+  newTag: 69e261d
