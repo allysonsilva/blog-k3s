@@ -86,6 +86,8 @@ echo
 php artisan app:generate-feed || true
 php artisan app:generate-sitemap || true
 
+php artisan vendor:publish --tag=laravel-assets --ansi --force || true
+
 npm --section=site run mix-production || true
 
 php artisan app:generate-partials-shell --no-interaction || true
