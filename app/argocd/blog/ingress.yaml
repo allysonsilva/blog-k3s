@@ -36,3 +36,22 @@ spec:
       middlewares:
         - name: security
           namespace: default
+---
+apiVersion: traefik.io/v1alpha1
+kind: IngressRoute
+metadata:
+  name: telescope
+spec:
+  entryPoints:
+    - websecure
+  routes:
+    - kind: Rule
+      match: Host(`telescope.${ARGOCD_ENV_DOMAIN}`)
+      priority: 21
+      services:
+        - name: blog-active
+          port: entrypoint
+          passHostHeader: true
+      middlewares:
+        - name: security
+          namespace: default
